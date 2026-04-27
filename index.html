@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GastroDoc - Symptom Checker</title>
+    <style>
+      body {
+        background-color: #0a1628;
+        color: #e8f4f8;
+        font-family: Arial, sans-serif;
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 20px;
+      }
+      h1 { color: #00c9a7; }
+      input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #00c9a7;
+        background: #132850;
+        color: #e8f4f8;
+        font-size: 16px;
+        margin: 10px 0 20px 0;
+        box-sizing: border-box;
+      }
+      .symptom {
+        background: #132850;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 16px;
+      }
+      button {
+        background: #00c9a7;
+        color: #0a1628;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+        width: 100%;
+      }
+      #result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #132850;
+        border-radius: 10px;
+        display: none;
+        line-height: 1.8;
+      }
+      #history {
+        margin-top: 30px;
+      }
+      .history-item {
+        background: #0f2040;
+        border-left: 3px solid #00c9a7;
+        padding: 10px 14px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #7fa8c9;
+      }
+    </style>
+  </head>
+  <body>
+
+    <h1>🩺 GastroDoc</h1>
+    <p>Patient Symptom Checker</p>
+
+    <label>Your Name:</label>
+    <input type="text" id="patientName" placeholder="Enter your full name" />
+
+    <p>Symptoms you are experiencing today:</p>
+
+    <div class="symptom">
+      <input type="checkbox" id="s1">
+      <label for="s1">Abdominal Pain</label>
+    </div>
+    <div class="symptom">
+      <input type="checkbox" id="s2">
+      <label for="s2">Bloating</label>
+    </div>
+    <div class="symptom">
+      <input type="checkbox" id="s3">
+      <label for="s3">Nausea</label>
+    </div>
+    <div class="symptom">
+      <input type="checkbox" id="s4">
+      <label for="s4">Diarrhea</label>
+    </div>
+    <div class="symptom">
+      <input type="checkbox" id="s5">
+      <label for="s5">Constipation</label>
+    </div>
+    <div class="symptom">
+      <input type="checkbox" id="s6">
+      <label for="s6">Heartburn / Acidity</label>
+    </div>
+
+    <button onclick="checkSymptoms()">Submit Symptoms</button>
+
+    <div id="result"></div>
+
+    <div id="history">
+      <p style="color:#7fa8c9; font-size:13px;">Previous Submissions This Session:</p>
+      <div id="historyList"></div>
+    </div>
+
+    <script>
+      function checkSymptoms() {
+        const name = document.getElementById('patientName').value;
+        const checked = document.querySelectorAll('input[type=checkbox]:checked');
+        const result = document.getElementById('result');
+        const historyList = document.getElementById('historyList');
+
+        if (!name) {
+          result.style.display = 'block';
+          result.innerHTML = '⚠️ Please enter your name first.';
+          return;
+        }
+
+        const symptoms = [];
+        checked.forEach(function(box) {
+          symptoms.push(box.nextElementSibling.innerText);
+        });
+
+        result.style.display = 'block';
+
+        if (symptoms.length === 0) {
+          result.innerHTML = '✅ ' + name + ', no symptoms selected. Great — you seem fine today!';
+        } else if (symptoms.length <= 2) {
+          result.innerHTML = '⚠️ ' + name + ', you have ' + symptoms.length + ' symptom(s):<br><strong>' + symptoms.join(', ') + '</strong><br><br>Monitor closely and stay hydrated.';
+        } else {
+          result.innerHTML = '🚨 ' + name + ', you have ' + symptoms.length + ' symptoms:<br><strong>' + symptoms.join(', ') + '</strong><br><br>Please book an appointment with Dr. Vivek soon.';
+        }
+
+        // Save to session history
+        const time = new Date().toLocaleTimeString();
+        const entry = document.createElement('div');
+        entry.className = 'history-item';
+        entry.innerHTML = '🕐 ' + time + ' — <strong style="color:#e8f4f8">' + name + '</strong>: ' + (symptoms.length === 0 ? 'No symptoms' : symptoms.join(', '));
+        historyList.appendChild(entry);
+
+        // Clear form
+        document.getElementById('patientName').value = '';
+        checked.forEach(function(box) { box.checked = false; });
+      }
+    </script>
+
+  </body>
+</html>
