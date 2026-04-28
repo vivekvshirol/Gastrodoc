@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GastroDoc - Symptom Checker</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+
+    <nav class="navbar">
+      <a class="logo" href="index.html">🩺 GastroDoc</a>
+      <div class="nav-links">
+        <a href="index.html" class="active">Symptoms</a>
+        <a href="appointments.html">Appointments</a>
+      </div>
+    </nav>
+
+    <p><strong>Patient Symptom Checker</strong></p>
+    <p style="color:#7fa8c9; font-size:13px; margin-bottom:20px">
+      Select your symptoms and submit
+    </p>
+
+    <label>YOUR NAME:</label>
+    <input type="text" id="patientName" placeholder="Enter your full name" />
+
+    <p style="margin:20px 0 10px">Symptoms you are experiencing today:</p>
+
+    <div class="symptom" onclick="toggle(this)">☐ Abdominal Pain</div>
+    <div class="symptom" onclick="toggle(this)">☐ Bloating</div>
+    <div class="symptom" onclick="toggle(this)">☐ Nausea</div>
+    <div class="symptom" onclick="toggle(this)">☐ Diarrhea</div>
+    <div class="symptom" onclick="toggle(this)">☐ Constipation</div>
+    <div class="symptom" onclick="toggle(this)">☐ Heartburn / Acidity</div>
+
+    <button onclick="submit()" style="margin-top:20px; width:100%">
+      Submit Symptoms
+    </button>
+
+    <div id="result" style="display:none; margin-top:20px; padding:16px;
+      background:#132850; border-radius:12px; line-height:1.8"></div>
+
+    <p style="color:#7fa8c9; font-size:13px; margin-top:24px">
+      Previous Submissions This Session:
+    </p>
+    <div id="historyList"></div>
+
+    <script>
+      function toggle(el) {
+        if (el.innerText.startsWith('☐')) {
+          el.innerText = '☑' + el.innerText.slice(1);
+          el.style.background = '#00c9a730';
+          el.style.borderLeft = '4px solid #00c9a7';
+        } else {
+          el.innerText = '☐' + el.innerText.slice(1);
+          el.style.background = '#132850';
+          el.style.borderLeft = 'none';
+        }
+      }
+
+      function submit() {
+        const name = document.getElementById('patientName').value;
+        const result = document.getElementById('result');
+        const historyList = document.getElementById('historyList');
+
+        if (!name) {
+          result.style.display = 'block';
+          result.innerHTML = '⚠️ Please enter your name first.';
+          return;
+        }
+
+        const selected = [];
+        document.querySelectorAll('.symptom').forEach(function(el) {
+          if (el.innerText.startsWith('☑')) {
+            selected.push(el.innerText.slice(2));
+          }
+        });
+
+        result.style.display = 'block';
+        if (selected.length === 0) {
+          result.innerHTML = '✅ ' + name + ', no symptoms. All clear!';
+        } else if (selected.length <= 2) {
+          result.innerHTML = '⚠️ ' + name + ', mild symptoms: <strong>'
+            + selected.join(', ') + '</strong><br>Monitor closely.';
+        } else {
+          result.innerHTML = '🚨 ' + name + ', you have '
+            + selected.length + ' symptoms: <strong>'
+            + selected.join(', ') + '</strong>'
+            + '<br><br>Please book an appointment with Dr. Vivek soon.';
+        }
+
+        const time = new Date().toLocaleTimeString();
+        const card = document.createElement('div');
+        card.className = 'history-item';
+        card.innerHTML = '🕐 ' + time + ' — <strong>' + name
+          + '</strong>: '
+          + (selected.length === 0 ? 'No symptoms' : selected.join(', '));
+        historyList.appendChild(card);
+
+        // Reset
+        document.getElementById('patientName').value = '';
+        document.querySelectorAll('.symptom').forEach(function(el) {
+          if (el.innerText.startsWith('☑')) {
+            el.innerText = '☐' + el.innerText.slice(1);
+            el.style.background = '#132850';
+            el.style.borderLeft = 'none';
+          }
+        });
+      }
+    </script>
+
+  </body>
+</html>

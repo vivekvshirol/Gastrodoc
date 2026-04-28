@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GastroDoc - Book Appointment</title>
+    <style>
+      body {
+        background-color: #0a1628;
+        color: #e8f4f8;
+        font-family: Arial, sans-serif;
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 20px;
+      }
+      h1 { color: #00c9a7; }
+      .field {
+        margin-bottom: 18px;
+      }
+      label {
+        display: block;
+        color: #7fa8c9;
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      input, select, textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #1e3a5f;
+        background: #132850;
+        color: #e8f4f8;
+        font-size: 15px;
+        box-sizing: border-box;
+      }
+      button {
+        width: 100%;
+        background: #00c9a7;
+        color: #0a1628;
+        border: none;
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      #confirmation {
+        display: none;
+        margin-top: 24px;
+        background: #132850;
+        border-left: 4px solid #00c9a7;
+        padding: 20px;
+        border-radius: 10px;
+        line-height: 1.8;
+      }
+      #allBookings {
+        margin-top: 30px;
+      }
+      .booking-card {
+        background: #0f2040;
+        border: 1px solid #1e3a5f;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        font-size: 14px;
+      }
+      .booking-card span {
+        color: #00c9a7;
+        font-weight: bold;
+      }
+      nav {
+        margin-bottom: 24px;
+      }
+      nav a {
+        color: #00c9a7;
+        text-decoration: none;
+        margin-right: 16px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <nav>
+      <a href="index.html">← Symptom Checker</a>
+      <a href="appointments.html">📅 Appointments</a>
+    </nav>
+
+    <h1>📅 Book Appointment</h1>
+    <p>Fill in your details and Dr. Vivek's clinic will confirm shortly.</p>
+
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="Your full name" />
+    </div>
+
+    <div class="field">
+      <label>Phone Number</label>
+      <input type="tel" id="phone" placeholder="+91 XXXXX XXXXX" />
+    </div>
+
+    <div class="field">
+      <label>Preferred Date</label>
+      <input type="date" id="date" />
+    </div>
+
+    <div class="field">
+      <label>Preferred Time</label>
+      <select id="time">
+        <option value="">Select a time slot</option>
+        <option>9:00 AM</option>
+        <option>9:30 AM</option>
+        <option>10:00 AM</option>
+        <option>10:30 AM</option>
+        <option>11:00 AM</option>
+        <option>11:30 AM</option>
+        <option>4:00 PM</option>
+        <option>4:30 PM</option>
+        <option>5:00 PM</option>
+        <option>5:30 PM</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Visit Type</label>
+      <select id="visitType">
+        <option>First Consultation</option>
+        <option>Follow-up</option>
+        <option>Post-Procedure</option>
+        <option>Emergency</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Brief Reason / Main Symptom</label>
+      <textarea id="reason" rows="3"
+        placeholder="E.g. Bloating and acidity for 2 weeks..."></textarea>
+    </div>
+
+    <button onclick="bookAppointment()">Confirm Appointment Request</button>
+
+    <div id="confirmation"></div>
+
+    <div id="allBookings">
+      <p style="color:#7fa8c9; font-size:13px;">
+        Appointments Booked This Session:
+      </p>
+      <div id="bookingList"></div>
+    </div>
+
+    <script>
+      // Store all bookings in an array (like a patient list!)
+      let bookings = [];
+
+      function bookAppointment() {
+        // Get all values from the form
+        let name     = document.getElementById('name').value;
+        let phone    = document.getElementById('phone').value;
+        let date     = document.getElementById('date').value;
+        let time     = document.getElementById('time').value;
+        let type     = document.getElementById('visitType').value;
+        let reason   = document.getElementById('reason').value;
+
+        // Validate — make sure nothing is empty
+        if (!name || !phone || !date || !time || !reason) {
+          alert('Please fill in all fields before confirming.');
+          return;
+        }
+
+        // Create a patient object (remember objects from practice.js!)
+        let appointment = {
+          name: name,
+          phone: phone,
+          date: date,
+          time: time,
+          type: type,
+          reason: reason
+        };
+
+        // Add to our bookings array
+        bookings.push(appointment);
+
+        // Show confirmation
+        let confirmation = document.getElementById('confirmation');
+        confirmation.style.display = 'block';
+        confirmation.innerHTML =
+          '✅ <strong>Appointment Requested!</strong><br><br>' +
+          '👤 Patient: <strong>' + name + '</strong><br>' +
+          '📅 Date: <strong>' + date + '</strong><br>' +
+          '🕐 Time: <strong>' + time + '</strong><br>' +
+          '🏥 Type: <strong>' + type + '</strong><br>' +
+          '📝 Reason: ' + reason + '<br><br>' +
+          '📞 Dr. Vivek\'s clinic will confirm on <strong>' + phone + '</strong> shortly.';
+
+        // Add to booking list below
+        let bookingList = document.getElementById('bookingList');
+        let card = document.createElement('div');
+        card.className = 'booking-card';
+        card.innerHTML =
+          '<span>' + name + '</span> · ' + date + ' at ' + time +
+          '<br>Type: ' + type + ' · 📞 ' + phone;
+        bookingList.appendChild(card);
+
+        // Clear the form
+        document.getElementById('name').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('date').value = '';
+        document.getElementById('time').value = '';
+        document.getElementById('reason').value = '';
+      }
+    </script>
+
+  </body>
+</html>

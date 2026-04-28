@@ -1,5 +1,15 @@
 import { useState } from "react";
 
+const bristolTypes = [
+  { type: 1, emoji: "🟤", desc: "Separate hard lumps", tag: "Constipation", color: "#ef4444" },
+  { type: 2, emoji: "🟤", desc: "Lumpy sausage shape", tag: "Constipation", color: "#ef4444" },
+  { type: 3, emoji: "🟫", desc: "Sausage with cracks", tag: "Normal", color: "#00c9a7" },
+  { type: 4, emoji: "🟢", desc: "Smooth soft sausage", tag: "Normal", color: "#00c9a7" },
+  { type: 5, emoji: "🟡", desc: "Soft blobs, clear edges", tag: "Lacking Fiber", color: "#f59e0b" },
+  { type: 6, emoji: "🟠", desc: "Fluffy, mushy pieces", tag: "Mild Diarrhea", color: "#f97316" },
+  { type: 7, emoji: "🔴", desc: "Entirely liquid", tag: "Diarrhea", color: "#ef4444" },
+];
+
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [patientName, setPatientName] = useState("");
@@ -10,10 +20,13 @@ export default function App() {
   const [apptPhone, setApptPhone] = useState("");
   const [apptDate, setApptDate] = useState("");
   const [apptType, setApptType] = useState("First Consultation");
+  const [bristolSelected, setBristolSelected] = useState(null);
+  const [bristolLogged, setBristolLogged] = useState(false);
+  const [bristolHistory, setBristolHistory] = useState([]);
 
   const symptomList = [
-    "Abdominal Pain", "Bloating", "Nausea",
-    "Diarrhea", "Constipation", "Heartburn / Acidity"
+    "Abdominal Pain","Bloating","Nausea",
+    "Diarrhea","Constipation","Heartburn / Acidity"
   ];
 
   const toggleSymptom = (s) => {
@@ -23,12 +36,9 @@ export default function App() {
   };
 
   const handleSubmit = () => {
-    if (!patientName) {
-      setSubmitResult("⚠️ Please enter your name first.");
-      return;
-    }
+    if (!patientName) { setSubmitResult("⚠️ Please enter your name first."); return; }
     if (symptoms.length === 0) {
-      setSubmitResult("✅ " + patientName + ", no symptoms selected. All clear!");
+      setSubmitResult("✅ " + patientName + ", no symptoms. All clear!");
     } else if (symptoms.length <= 2) {
       setSubmitResult("⚠️ " + patientName + ", mild symptoms: " + symptoms.join(", ") + ". Monitor closely.");
     } else {
@@ -37,11 +47,21 @@ export default function App() {
   };
 
   const handleAppointment = () => {
-    if (!apptName || !apptPhone || !apptDate) {
-      alert("Please fill in all fields.");
-      return;
-    }
+    if (!apptName || !apptPhone || !apptDate) { alert("Please fill in all fields."); return; }
     setAppointmentDone(true);
+  };
+
+  const handleBristolLog = () => {
+    if (!bristolSelected) return;
+    const entry = {
+      type: bristolSelected.type,
+      tag: bristolSelected.tag,
+      time: new Date().toLocaleTimeString(),
+      date: new Date().toLocaleDateString(),
+    };
+    setBristolHistory(prev => [entry, ...prev]);
+    setBristolLogged(true);
+    setTimeout(() => { setBristolLogged(false); setBristolSelected(null); }, 2000);
   };
 
   const s = {
@@ -59,8 +79,8 @@ export default function App() {
     navBtn: (active) => ({
       background: active ? "#00c9a720" : "none",
       border: "none", color: active ? "#00c9a7" : "#7fa8c9",
-      cursor: "pointer", fontSize: 13,
-      padding: "6px 10px", borderRadius: 8
+      cursor: "pointer", fontSize: 12,
+      padding: "6px 8px", borderRadius: 8
     }),
     page: { padding: "24px 20px" },
     title: { color: "#00c9a7", fontSize: 22, marginBottom: 6 },
@@ -84,6 +104,13 @@ export default function App() {
       borderLeft: selected ? "4px solid #00c9a7" : "4px solid transparent",
       borderRadius: 10, padding: "14px 16px", marginBottom: 10,
       cursor: "pointer", fontSize: 15, transition: "all 0.2s"
+    }),
+    bristolCard: (selected) => ({
+      background: selected ? "#00c9a720" : "#132850",
+      border: selected ? "2px solid #00c9a7" : "2px solid transparent",
+      borderRadius: 14, padding: "14px 16px", marginBottom: 10,
+      cursor: "pointer", display: "flex", alignItems: "center",
+      gap: 14, transition: "all 0.2s"
     }),
     btn: {
       width: "100%", background: "#00c9a7", color: "#0a1628",
@@ -111,11 +138,18 @@ export default function App() {
     },
     bottomBtn: (active) => ({
       background: "none", border: "none", cursor: "pointer",
-      color: active ? "#00c9a7" : "#7fa8c9", fontSize: 11,
+      color: active ? "#00c9a7" : "#7fa8c9", fontSize: 10,
       display: "flex", flexDirection: "column",
-      alignItems: "center", gap: 3, padding: "4px 8px"
+      alignItems: "center", gap: 3, padding: "4px 6px"
     })
   };
+
+  const navScreens = [
+    {id:"home", icon:"🏠", label:"Home"},
+    {id:"symptoms", icon:"📋", label:"Symptoms"},
+    {id:"bristol", icon:"💧", label:"Bristol"},
+    {id:"appointments", icon:"📅", label:"Appts"},
+  ];
 
   return (
     <div style={s.app}>
@@ -124,10 +158,10 @@ export default function App() {
       <div style={s.navbar}>
         <span style={s.logo}>🩺 GastroDoc</span>
         <div>
-          {["home","symptoms","appointments"].map(sc => (
-            <button key={sc} style={s.navBtn(screen===sc)}
-              onClick={() => setScreen(sc)}>
-              {sc.charAt(0).toUpperCase() + sc.slice(1)}
+          {navScreens.map(sc => (
+            <button key={sc.id} style={s.navBtn(screen===sc.id)}
+              onClick={() => setScreen(sc.id)}>
+              {sc.icon}
             </button>
           ))}
         </div>
@@ -138,7 +172,6 @@ export default function App() {
         <div style={s.page}>
           <h2 style={s.title}>Welcome 👋</h2>
           <p style={s.subtitle}>Your personal GI health companion</p>
-
           <div style={s.card}>
             <p style={{color:"#00c9a7",fontWeight:"bold",marginBottom:8}}>
               👨‍⚕️ Dr. Vivek Shirol
@@ -146,7 +179,6 @@ export default function App() {
             <p style={{color:"#7fa8c9",fontSize:13}}>Gastroenterologist</p>
             <p style={{color:"#7fa8c9",fontSize:13}}>📍 Your Clinic Name</p>
           </div>
-
           <div style={{...s.card, borderLeft:"3px solid #00c9a7"}}>
             <p style={{color:"#00c9a7",fontSize:12,fontWeight:"bold",marginBottom:6}}>
               💡 Weekly Tip
@@ -156,12 +188,15 @@ export default function App() {
               Large meals stimulate bowel contractions.
             </p>
           </div>
-
           <button style={s.btn} onClick={() => setScreen("symptoms")}>
             Check My Symptoms
           </button>
           <button style={s.btnOutline} onClick={() => setScreen("appointments")}>
             Book Appointment
+          </button>
+          <button style={{...s.btnOutline, marginTop:10}}
+            onClick={() => setScreen("bristol")}>
+            Bristol Stool Tracker 💧
           </button>
         </div>
       )}
@@ -171,30 +206,81 @@ export default function App() {
         <div style={s.page}>
           <h2 style={s.title}>Symptom Checker</h2>
           <p style={s.subtitle}>Select all symptoms you are experiencing today</p>
-
           <label style={s.label}>Your Name</label>
           <input style={s.input} placeholder="Enter your full name"
-            value={patientName}
-            onChange={e => setPatientName(e.target.value)} />
-
+            value={patientName} onChange={e => setPatientName(e.target.value)} />
           <p style={{color:"#7fa8c9",fontSize:12,marginBottom:12}}>
             TAP to select symptoms:
           </p>
-
           {symptomList.map(sym => (
-            <div key={sym}
-              style={s.symptomCard(symptoms.includes(sym))}
+            <div key={sym} style={s.symptomCard(symptoms.includes(sym))}
               onClick={() => toggleSymptom(sym)}>
               {symptoms.includes(sym) ? "☑" : "☐"} {sym}
             </div>
           ))}
-
           <button style={s.btn} onClick={handleSubmit}>
             Submit Symptoms
           </button>
+          {submitResult && <div style={s.result}>{submitResult}</div>}
+        </div>
+      )}
 
-          {submitResult && (
-            <div style={s.result}>{submitResult}</div>
+      {/* ── BRISTOL ── */}
+      {screen === "bristol" && (
+        <div style={s.page}>
+          <h2 style={s.title}>Bristol Stool Chart</h2>
+          <p style={s.subtitle}>Tap your stool type to log it</p>
+
+          {bristolTypes.map(b => (
+            <div key={b.type}
+              style={s.bristolCard(bristolSelected?.type === b.type)}
+              onClick={() => { setBristolSelected(b); setBristolLogged(false); }}>
+              <span style={{fontSize:28}}>{b.emoji}</span>
+              <div style={{flex:1}}>
+                <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:3}}>
+                  <span style={{color:"#e8f4f8",fontWeight:"bold",fontSize:14}}>
+                    Type {b.type}
+                  </span>
+                  <span style={{
+                    background: b.color + "30",
+                    color: b.color,
+                    fontSize:11, padding:"2px 8px", borderRadius:20
+                  }}>{b.tag}</span>
+                </div>
+                <p style={{color:"#7fa8c9",fontSize:12,margin:0}}>{b.desc}</p>
+              </div>
+              {bristolSelected?.type === b.type &&
+                <span style={{color:"#00c9a7",fontSize:20}}>✓</span>}
+            </div>
+          ))}
+
+          {bristolSelected && (
+            <button style={s.btn} onClick={handleBristolLog}>
+              {bristolLogged ? "✅ Logged!" : "Log This Entry"}
+            </button>
+          )}
+
+          {bristolHistory.length > 0 && (
+            <div style={{marginTop:24}}>
+              <p style={{color:"#7fa8c9",fontSize:12,
+                fontWeight:"bold",marginBottom:12}}>
+                RECENT LOGS
+              </p>
+              {bristolHistory.map((h, i) => (
+                <div key={i} style={{...s.card, display:"flex",
+                  justifyContent:"space-between", alignItems:"center"}}>
+                  <div>
+                    <p style={{color:"#e8f4f8",fontWeight:"bold",
+                      fontSize:14,margin:"0 0 3px"}}>
+                      Type {h.type} — {h.tag}
+                    </p>
+                    <p style={{color:"#7fa8c9",fontSize:12,margin:0}}>
+                      {h.date} at {h.time}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
@@ -204,24 +290,17 @@ export default function App() {
         <div style={s.page}>
           <h2 style={s.title}>Book Appointment</h2>
           <p style={s.subtitle}>Fill in your details below</p>
-
           {!appointmentDone ? (
             <>
               <label style={s.label}>Full Name</label>
               <input style={s.input} placeholder="Your full name"
-                value={apptName}
-                onChange={e => setApptName(e.target.value)} />
-
+                value={apptName} onChange={e => setApptName(e.target.value)} />
               <label style={s.label}>Phone Number</label>
               <input style={s.input} placeholder="+91 XXXXX XXXXX"
-                value={apptPhone}
-                onChange={e => setApptPhone(e.target.value)} />
-
+                value={apptPhone} onChange={e => setApptPhone(e.target.value)} />
               <label style={s.label}>Preferred Date</label>
               <input style={s.input} type="date"
-                value={apptDate}
-                onChange={e => setApptDate(e.target.value)} />
-
+                value={apptDate} onChange={e => setApptDate(e.target.value)} />
               <label style={s.label}>Visit Type</label>
               <select style={s.input} value={apptType}
                 onChange={e => setApptType(e.target.value)}>
@@ -230,7 +309,6 @@ export default function App() {
                 <option>Post-Procedure</option>
                 <option>Emergency</option>
               </select>
-
               <button style={s.btn} onClick={handleAppointment}>
                 Confirm Appointment
               </button>
@@ -238,7 +316,8 @@ export default function App() {
           ) : (
             <div style={s.success}>
               <p style={{fontSize:32,margin:"0 0 12px"}}>✅</p>
-              <p style={{color:"#00c9a7",fontWeight:"bold",fontSize:16,margin:"0 0 8px"}}>
+              <p style={{color:"#00c9a7",fontWeight:"bold",
+                fontSize:16,margin:"0 0 8px"}}>
                 Appointment Requested!
               </p>
               <p style={{color:"#e8f4f8",fontSize:14,margin:"0 0 4px"}}>
@@ -253,8 +332,7 @@ export default function App() {
               <button style={{...s.btn, marginTop:16}}
                 onClick={() => {
                   setAppointmentDone(false);
-                  setApptName(""); setApptPhone("");
-                  setApptDate("");
+                  setApptName(""); setApptPhone(""); setApptDate("");
                 }}>
                 Book Another
               </button>
@@ -265,11 +343,7 @@ export default function App() {
 
       {/* Bottom Nav */}
       <div style={s.bottomNav}>
-        {[
-          {id:"home", icon:"🏠", label:"Home"},
-          {id:"symptoms", icon:"📋", label:"Symptoms"},
-          {id:"appointments", icon:"📅", label:"Appointments"},
-        ].map(n => (
+        {navScreens.map(n => (
           <button key={n.id} style={s.bottomBtn(screen===n.id)}
             onClick={() => setScreen(n.id)}>
             <span style={{fontSize:20}}>{n.icon}</span>
