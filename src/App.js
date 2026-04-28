@@ -16,6 +16,30 @@ const clinic = {
   holiday: "Sunday: Closed",
 };
 
+const videos = [
+  {
+    title: "Understanding Your Gut Health",
+    platform: "YouTube",
+    link: "https://youtu.be/9gMcC8mCCVs?si=QScpjzeYeV7btk-i",
+    emoji: "▶️",
+    color: "#ef4444",
+  },
+  {
+    title: "GI Health Tips & Advice",
+    platform: "YouTube",
+    link: "https://youtu.be/nP8lG26EwdU?si=E8DAMIMFfwTU_haJ",
+    emoji: "▶️",
+    color: "#ef4444",
+  },
+  {
+    title: "Follow on Instagram",
+    platform: "Instagram",
+    link: "https://www.instagram.com/vivekshirol_234?igsh=MTloNzNxZ2xsbHp3NA==",
+    emoji: "📱",
+    color: "#e91e63",
+  },
+];
+
 const bristolTypes = [
   { type: 1, emoji: "🟤", desc: "Separate hard lumps", tag: "Constipation", color: "#ef4444" },
   { type: 2, emoji: "🟤", desc: "Lumpy sausage shape", tag: "Constipation", color: "#ef4444" },
@@ -32,6 +56,8 @@ const weeklyTips = [
   "Peppermint oil capsules (enteric-coated) have clinical evidence for reducing IBS cramping.",
   "Stress is a key IBS trigger. Even 10 minutes of deep breathing daily reduces gut sensitivity.",
   "A low-FODMAP diet can reduce bloating and gas in IBS patients by up to 75%.",
+  "Avoid lying down for at least 2 hours after meals to reduce acid reflux symptoms.",
+  "Probiotics like Lactobacillus can help restore gut flora after antibiotic treatment.",
 ];
 
 export default function App() {
@@ -57,8 +83,8 @@ export default function App() {
   const tip = weeklyTips[new Date().getDay() % weeklyTips.length];
 
   const symptomList = [
-    "Abdominal Pain","Bloating","Nausea",
-    "Diarrhea","Constipation","Heartburn / Acidity"
+    "Abdominal Pain", "Bloating", "Nausea",
+    "Diarrhea", "Constipation", "Heartburn / Acidity"
   ];
 
   useEffect(() => {
@@ -208,11 +234,12 @@ export default function App() {
   };
 
   const navScreens = [
-    {id:"home", icon:"🏠", label:"Home"},
-    {id:"symptoms", icon:"📋", label:"Symptoms"},
-    {id:"bristol", icon:"💧", label:"Bristol"},
-    {id:"appointments", icon:"📅", label:"Appts"},
-    {id:"contact", icon:"💬", label:"Contact"},
+    { id: "home", icon: "🏠", label: "Home" },
+    { id: "symptoms", icon: "📋", label: "Symptoms" },
+    { id: "bristol", icon: "💧", label: "Bristol" },
+    { id: "appointments", icon: "📅", label: "Appts" },
+    { id: "videos", icon: "▶️", label: "Videos" },
+    { id: "contact", icon: "💬", label: "Contact" },
   ];
 
   return (
@@ -220,11 +247,11 @@ export default function App() {
       <div style={s.navbar}>
         <div>
           <div style={s.logo}>🩺 GastroDoc</div>
-          <div style={{color:"#7fa8c9",fontSize:10}}>{clinic.clinic}</div>
+          <div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div>
         </div>
         <div>
           {navScreens.map(sc => (
-            <button key={sc.id} style={s.navBtn(screen===sc.id)}
+            <button key={sc.id} style={s.navBtn(screen === sc.id)}
               onClick={() => setScreen(sc.id)}>
               {sc.icon}
             </button>
@@ -238,55 +265,32 @@ export default function App() {
           <h2 style={s.title}>Welcome 👋</h2>
           <p style={s.subtitle}>Your personal GI health companion</p>
 
-          {/* Doctor Card */}
-          <div style={{...s.card, background:"linear-gradient(135deg,#0d2d50,#0a1f3a)"}}>
-            <p style={{color:"#00c9a7",fontWeight:"bold",fontSize:16,margin:"0 0 4px"}}>
+          <div style={{ ...s.card, background: "linear-gradient(135deg,#0d2d50,#0a1f3a)" }}>
+            <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 16, margin: "0 0 4px" }}>
               👨‍⚕️ {clinic.doctor}
             </p>
-            <p style={{color:"#e8f4f8",fontSize:13,margin:"0 0 2px"}}>
-              {clinic.quals}
-            </p>
-            <p style={{color:"#7fa8c9",fontSize:13,margin:"0 0 2px"}}>
-              🏥 {clinic.clinic}
-            </p>
-            <p style={{color:"#7fa8c9",fontSize:13,margin:"0 0 2px"}}>
-              📍 {clinic.address}
-            </p>
-            <p style={{color:"#7fa8c9",fontSize:13,margin:"0 0 2px"}}>
-              📞 {clinic.phone}
-            </p>
-            <p style={{color:"#00c9a7",fontSize:13,margin:"6px 0 0",fontWeight:"bold"}}>
+            <p style={{ color: "#e8f4f8", fontSize: 13, margin: "0 0 2px" }}>{clinic.quals}</p>
+            <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 2px" }}>🏥 {clinic.clinic}</p>
+            <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 2px" }}>📍 {clinic.address}</p>
+            <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 2px" }}>📞 {clinic.phone}</p>
+            <p style={{ color: "#00c9a7", fontSize: 13, margin: "6px 0 0", fontWeight: "bold" }}>
               🕐 {clinic.timings}
             </p>
-            <p style={{color:"#ef4444",fontSize:12,margin:"2px 0 0"}}>
-              🔴 {clinic.holiday}
-            </p>
+            <p style={{ color: "#ef4444", fontSize: 12, margin: "2px 0 0" }}>🔴 {clinic.holiday}</p>
           </div>
 
-          {/* Weekly Tip */}
-          <div style={{...s.card, borderLeft:"3px solid #3b82f6"}}>
-            <p style={{color:"#3b82f6",fontSize:11,fontWeight:"bold",marginBottom:5}}>
+          <div style={{ ...s.card, borderLeft: "3px solid #3b82f6" }}>
+            <p style={{ color: "#3b82f6", fontSize: 11, fontWeight: "bold", marginBottom: 5 }}>
               💡 WEEKLY HEALTH TIP
             </p>
-            <p style={{color:"#e8f4f8",fontSize:13,lineHeight:1.6,margin:0}}>
-              {tip}
-            </p>
+            <p style={{ color: "#e8f4f8", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{tip}</p>
           </div>
 
-          <button style={s.btn} onClick={() => setScreen("symptoms")}>
-            📋 Check My Symptoms
-          </button>
-          <button style={s.btnOutline} onClick={() => setScreen("appointments")}>
-            📅 Book Appointment
-          </button>
-          <button style={{...s.btnOutline,marginTop:8}}
-            onClick={() => setScreen("bristol")}>
-            💧 Bristol Stool Tracker
-          </button>
-          <button style={{...s.btnOutline,marginTop:8}}
-            onClick={() => setScreen("contact")}>
-            💬 Contact / Message Us
-          </button>
+          <button style={s.btn} onClick={() => setScreen("symptoms")}>📋 Check My Symptoms</button>
+          <button style={s.btnOutline} onClick={() => setScreen("appointments")}>📅 Book Appointment</button>
+          <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("bristol")}>💧 Bristol Stool Tracker</button>
+          <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("videos")}>▶️ Watch Health Videos</button>
+          <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("contact")}>💬 Contact / Message Us</button>
         </div>
       )}
 
@@ -298,9 +302,7 @@ export default function App() {
           <label style={s.label}>Your Name</label>
           <input style={s.input} placeholder="Enter your full name"
             value={patientName} onChange={e => setPatientName(e.target.value)} />
-          <p style={{color:"#7fa8c9",fontSize:12,marginBottom:10}}>
-            Tap to select your symptoms:
-          </p>
+          <p style={{ color: "#7fa8c9", fontSize: 12, marginBottom: 10 }}>Tap to select your symptoms:</p>
           {symptomList.map(sym => (
             <div key={sym} style={s.symptomCard(symptoms.includes(sym))}
               onClick={() => toggleSymptom(sym)}>
@@ -321,21 +323,15 @@ export default function App() {
             <div key={b.type}
               style={s.bristolCard(bristolSelected?.type === b.type)}
               onClick={() => { setBristolSelected(b); setBristolLogged(false); }}>
-              <span style={{fontSize:26}}>{b.emoji}</span>
-              <div style={{flex:1}}>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:2}}>
-                  <span style={{color:"#e8f4f8",fontWeight:"bold",fontSize:14}}>
-                    Type {b.type}
-                  </span>
-                  <span style={{
-                    background:b.color+"30",color:b.color,
-                    fontSize:10,padding:"2px 8px",borderRadius:20
-                  }}>{b.tag}</span>
+              <span style={{ fontSize: 26 }}>{b.emoji}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                  <span style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 14 }}>Type {b.type}</span>
+                  <span style={{ background: b.color + "30", color: b.color, fontSize: 10, padding: "2px 8px", borderRadius: 20 }}>{b.tag}</span>
                 </div>
-                <p style={{color:"#7fa8c9",fontSize:12,margin:0}}>{b.desc}</p>
+                <p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>{b.desc}</p>
               </div>
-              {bristolSelected?.type === b.type &&
-                <span style={{color:"#00c9a7",fontSize:18}}>✓</span>}
+              {bristolSelected?.type === b.type && <span style={{ color: "#00c9a7", fontSize: 18 }}>✓</span>}
             </div>
           ))}
           {bristolSelected && (
@@ -344,18 +340,12 @@ export default function App() {
             </button>
           )}
           {bristolHistory.length > 0 && (
-            <div style={{marginTop:20}}>
-              <p style={{color:"#7fa8c9",fontSize:11,fontWeight:"bold",
-                marginBottom:10,letterSpacing:0.5}}>RECENT LOGS</p>
-              {bristolHistory.map((h,i) => (
+            <div style={{ marginTop: 20 }}>
+              <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 10 }}>RECENT LOGS</p>
+              {bristolHistory.map((h, i) => (
                 <div key={i} style={s.card}>
-                  <p style={{color:"#e8f4f8",fontWeight:"bold",
-                    fontSize:13,margin:"0 0 2px"}}>
-                    Type {h.type} — {h.tag}
-                  </p>
-                  <p style={{color:"#7fa8c9",fontSize:12,margin:0}}>
-                    {h.date} at {h.time}
-                  </p>
+                  <p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 2px" }}>Type {h.type} — {h.tag}</p>
+                  <p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>{h.date} at {h.time}</p>
                 </div>
               ))}
             </div>
@@ -367,9 +357,7 @@ export default function App() {
       {screen === "appointments" && (
         <div style={s.page}>
           <h2 style={s.title}>Book Appointment</h2>
-          <p style={s.subtitle}>
-            🕐 {clinic.timings} · 🔴 {clinic.holiday}
-          </p>
+          <p style={s.subtitle}>🕐 {clinic.timings} · 🔴 {clinic.holiday}</p>
           {!appointmentDone ? (
             <>
               <label style={s.label}>Full Name</label>
@@ -382,8 +370,7 @@ export default function App() {
               <input style={s.input} type="date"
                 value={apptDate} onChange={e => setApptDate(e.target.value)} />
               <label style={s.label}>Visit Type</label>
-              <select style={s.input} value={apptType}
-                onChange={e => setApptType(e.target.value)}>
+              <select style={s.input} value={apptType} onChange={e => setApptType(e.target.value)}>
                 <option>First Consultation</option>
                 <option>Follow-up</option>
                 <option>Post-Procedure</option>
@@ -395,50 +382,81 @@ export default function App() {
             </>
           ) : (
             <div style={s.success}>
-              <p style={{fontSize:32,margin:"0 0 10px"}}>✅</p>
-              <p style={{color:"#00c9a7",fontWeight:"bold",fontSize:16,margin:"0 0 8px"}}>
-                Appointment Requested!
-              </p>
-              <p style={{color:"#e8f4f8",fontSize:14,margin:"0 0 3px"}}>
-                👤 {apptName}
-              </p>
-              <p style={{color:"#e8f4f8",fontSize:14,margin:"0 0 3px"}}>
-                📅 {apptDate} · {apptType}
-              </p>
-              <p style={{color:"#7fa8c9",fontSize:13,marginTop:10}}>
+              <p style={{ fontSize: 32, margin: "0 0 10px" }}>✅</p>
+              <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 16, margin: "0 0 8px" }}>Appointment Requested!</p>
+              <p style={{ color: "#e8f4f8", fontSize: 14, margin: "0 0 3px" }}>👤 {apptName}</p>
+              <p style={{ color: "#e8f4f8", fontSize: 14, margin: "0 0 3px" }}>📅 {apptDate} · {apptType}</p>
+              <p style={{ color: "#7fa8c9", fontSize: 13, marginTop: 10 }}>
                 {clinic.clinic} will confirm on {apptPhone} shortly.
               </p>
-              <button style={{...s.btn,marginTop:14}}
-                onClick={() => {
-                  setAppointmentDone(false);
-                  setApptName(""); setApptPhone(""); setApptDate("");
-                  fetchAppointments();
-                }}>
+              <button style={{ ...s.btn, marginTop: 14 }}
+                onClick={() => { setAppointmentDone(false); setApptName(""); setApptPhone(""); setApptDate(""); fetchAppointments(); }}>
                 Book Another
               </button>
             </div>
           )}
-
           {savedAppointments.length > 0 && (
-            <div style={{marginTop:20}}>
-              <p style={{color:"#7fa8c9",fontSize:11,fontWeight:"bold",
-                marginBottom:10,letterSpacing:0.5}}>RECENT BOOKINGS</p>
-              {savedAppointments.map((a,i) => (
+            <div style={{ marginTop: 20 }}>
+              <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 10 }}>RECENT BOOKINGS</p>
+              {savedAppointments.map((a, i) => (
                 <div key={i} style={s.card}>
-                  <p style={{color:"#e8f4f8",fontWeight:"bold",
-                    fontSize:13,margin:"0 0 3px"}}>
-                    👤 {a.patient_name}
-                  </p>
-                  <p style={{color:"#7fa8c9",fontSize:12,margin:"0 0 2px"}}>
-                    📅 {a.date} · {a.visit_type}
-                  </p>
-                  <p style={{color:"#7fa8c9",fontSize:12,margin:0}}>
-                    📞 {a.phone}
-                  </p>
+                  <p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 3px" }}>👤 {a.patient_name}</p>
+                  <p style={{ color: "#7fa8c9", fontSize: 12, margin: "0 0 2px" }}>📅 {a.date} · {a.visit_type}</p>
+                  <p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>📞 {a.phone}</p>
                 </div>
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── VIDEOS ── */}
+      {screen === "videos" && (
+        <div style={s.page}>
+          <h2 style={s.title}>Health Videos ▶️</h2>
+          <p style={s.subtitle}>Educational content by {clinic.doctor}</p>
+
+          {videos.map((v, i) => (
+            <div key={i} style={s.card}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: 12,
+                  background: v.color + "25",
+                  display: "flex", alignItems: "center",
+                  justifyContent: "center", fontSize: 26, flexShrink: 0
+                }}>
+                  {v.emoji}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 14, margin: "0 0 4px" }}>
+                    {v.title}
+                  </p>
+                  <p style={{ color: "#7fa8c9", fontSize: 12, margin: "0 0 10px" }}>
+                    {v.platform}
+                  </p>
+                  <a href={v.link} target="_blank" rel="noreferrer"
+                    style={{
+                      background: v.color, color: "#fff",
+                      padding: "6px 16px", borderRadius: 20,
+                      fontSize: 12, fontWeight: "bold",
+                      textDecoration: "none", display: "inline-block"
+                    }}>
+                    {v.platform === "YouTube" ? "▶ Watch" : "📱 Follow"}
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <div style={{ ...s.card, borderLeft: "3px solid #00c9a7", marginTop: 8 }}>
+            <p style={{ color: "#00c9a7", fontSize: 12, fontWeight: "bold", marginBottom: 6 }}>
+              🔔 Stay Updated
+            </p>
+            <p style={{ color: "#7fa8c9", fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+              Subscribe to {clinic.doctor}'s YouTube channel and follow on Instagram
+              for weekly GI health tips, procedure explanations, and diet advice!
+            </p>
+          </div>
         </div>
       )}
 
@@ -448,53 +466,38 @@ export default function App() {
           <h2 style={s.title}>Contact Us 💬</h2>
           <p style={s.subtitle}>Send us a message or query</p>
 
-          {/* Clinic Info */}
           <div style={s.card}>
-            <p style={{color:"#00c9a7",fontWeight:"bold",
-              fontSize:14,margin:"0 0 10px"}}>
+            <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 14, margin: "0 0 10px" }}>
               🏥 {clinic.clinic}
             </p>
-            <p style={{color:"#7fa8c9",fontSize:13,margin:"0 0 5px"}}>
-              📍 {clinic.address}
-            </p>
-            <p style={{color:"#7fa8c9",fontSize:13,margin:"0 0 5px"}}>
-              📞 {clinic.phone}
-            </p>
-            <p style={{color:"#00c9a7",fontSize:13,margin:"0 0 3px",fontWeight:"bold"}}>
-              🕐 {clinic.timings}
-            </p>
-            <p style={{color:"#ef4444",fontSize:12,margin:0}}>
-              🔴 {clinic.holiday}
-            </p>
+            <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 5px" }}>📍 {clinic.address}</p>
+            <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 5px" }}>📞 {clinic.phone}</p>
+            <p style={{ color: "#00c9a7", fontSize: 13, margin: "0 0 3px", fontWeight: "bold" }}>🕐 {clinic.timings}</p>
+            <p style={{ color: "#ef4444", fontSize: 12, margin: 0 }}>🔴 {clinic.holiday}</p>
           </div>
 
-          {/* WhatsApp Button */}
-          <a href={"https://wa.me/91" + clinic.phone.replace(/\D/g,"")}
+          <a href={"https://wa.me/91" + clinic.phone.replace(/\D/g, "")}
             target="_blank" rel="noreferrer"
             style={{
-              display:"block", background:"#25D366", color:"#fff",
-              textAlign:"center", padding:14, borderRadius:12,
-              fontWeight:"bold", fontSize:15, textDecoration:"none",
-              marginBottom:10
+              display: "block", background: "#25D366", color: "#fff",
+              textAlign: "center", padding: 14, borderRadius: 12,
+              fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 10
             }}>
             💬 WhatsApp Us
           </a>
 
           <a href={"tel:" + clinic.phone}
             style={{
-              display:"block", background:"#1e3a5f", color:"#00c9a7",
-              textAlign:"center", padding:13, borderRadius:12,
-              fontWeight:"bold", fontSize:15, textDecoration:"none",
-              marginBottom:16
+              display: "block", background: "#1e3a5f", color: "#00c9a7",
+              textAlign: "center", padding: 13, borderRadius: 12,
+              fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 16
             }}>
             📞 Call Clinic
           </a>
 
-          {/* Message Form */}
           {!msgSent ? (
             <>
-              <p style={{color:"#7fa8c9",fontSize:12,fontWeight:"bold",
-                marginBottom:12,letterSpacing:0.5}}>
+              <p style={{ color: "#7fa8c9", fontSize: 12, fontWeight: "bold", marginBottom: 12 }}>
                 SEND A MESSAGE
               </p>
               <label style={s.label}>Your Name</label>
@@ -504,28 +507,22 @@ export default function App() {
               <input style={s.input} placeholder="+91 XXXXX XXXXX"
                 value={msgPhone} onChange={e => setMsgPhone(e.target.value)} />
               <label style={s.label}>Your Query / Message</label>
-              <textarea style={{...s.input, height:100, resize:"none"}}
+              <textarea style={{ ...s.input, height: 100, resize: "none" }}
                 placeholder="Type your question or message here..."
                 value={msgText} onChange={e => setMsgText(e.target.value)} />
-              <button style={s.btn} onClick={handleMessage}>
-                Send Message
-              </button>
+              <button style={s.btn} onClick={handleMessage}>Send Message</button>
             </>
           ) : (
             <div style={s.success}>
-              <p style={{fontSize:32,margin:"0 0 8px"}}>✅</p>
-              <p style={{color:"#00c9a7",fontWeight:"bold",
-                fontSize:16,margin:"0 0 6px"}}>
+              <p style={{ fontSize: 32, margin: "0 0 8px" }}>✅</p>
+              <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 16, margin: "0 0 6px" }}>
                 Message Received!
               </p>
-              <p style={{color:"#7fa8c9",fontSize:13,margin:0}}>
+              <p style={{ color: "#7fa8c9", fontSize: 13, margin: 0 }}>
                 {clinic.doctor}'s team will get back to you on {msgPhone} shortly.
               </p>
-              <button style={{...s.btn,marginTop:14}}
-                onClick={() => {
-                  setMsgSent(false);
-                  setMsgName(""); setMsgPhone(""); setMsgText("");
-                }}>
+              <button style={{ ...s.btn, marginTop: 14 }}
+                onClick={() => { setMsgSent(false); setMsgName(""); setMsgPhone(""); setMsgText(""); }}>
                 Send Another
               </button>
             </div>
@@ -536,9 +533,9 @@ export default function App() {
       {/* Bottom Nav */}
       <div style={s.bottomNav}>
         {navScreens.map(n => (
-          <button key={n.id} style={s.bottomBtn(screen===n.id)}
+          <button key={n.id} style={s.bottomBtn(screen === n.id)}
             onClick={() => setScreen(n.id)}>
-            <span style={{fontSize:18}}>{n.icon}</span>
+            <span style={{ fontSize: 16 }}>{n.icon}</span>
             {n.label}
           </button>
         ))}
