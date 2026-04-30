@@ -6,12 +6,13 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tYXRsZ3Bjdmh2Z2VxaWF6dXR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNzg2NjUsImV4cCI6MjA5Mjk1NDY2NX0._nEy0wPP_mRcjPUO9v6oBBhdcCRYERwC8sDULwTUjcI"
 );
 
+// ── CHANGE 3: Updated phone number ──
 const clinic = {
   doctor: "Dr. Vivek Shirol",
   quals: "MBBS, MD, DM Gastroenterology, SGPGI",
   clinic: "Dr. Vivek's Complete Gastro Care Clinic",
   address: "Belagavi, Karnataka",
-  phone: "7760933XXX",
+  phone: "8310417749",
   timings: "Mon–Sat: 5:00 PM – 9:00 PM",
   holiday: "Sunday: Closed",
 };
@@ -30,6 +31,13 @@ const bristolTypes = [
   { type: 5, emoji: "🟡", desc: "Soft blobs, clear edges", tag: "Lacking Fiber", color: "#f59e0b" },
   { type: 6, emoji: "🟠", desc: "Fluffy, mushy pieces", tag: "Mild Diarrhea", color: "#f97316" },
   { type: 7, emoji: "🔴", desc: "Entirely liquid", tag: "Diarrhea", color: "#ef4444" },
+];
+
+// ── CHANGE 2: Expanded symptom list ──
+const symptomList = [
+  "Abdominal Pain", "Bloating", "Nausea", "Vomiting", "Diarrhea",
+  "Constipation", "Heartburn / Acidity", "Mucus in Stools",
+  "Early Satiety", "Regurgitation", "Weight Loss", "Blood in Stool",
 ];
 
 const allHealthTips = [
@@ -145,16 +153,9 @@ const allHealthTips = [
 ];
 
 const diagnosisList = [
-  "GERD / Acid Reflux",
-  "IBS (Irritable Bowel Syndrome)",
-  "IBD / Crohn's Disease",
-  "IBD / Ulcerative Colitis",
-  "NAFLD / Fatty Liver",
-  "Chronic Constipation",
-  "Diverticular Disease",
-  "Gastritis",
-  "Peptic Ulcer Disease",
-  "Celiac Disease",
+  "GERD / Acid Reflux", "IBS (Irritable Bowel Syndrome)", "IBD / Crohn's Disease",
+  "IBD / Ulcerative Colitis", "NAFLD / Fatty Liver", "Chronic Constipation",
+  "Diverticular Disease", "Gastritis", "Peptic Ulcer Disease", "Celiac Disease",
   "Other / Not Diagnosed Yet",
 ];
 
@@ -169,10 +170,18 @@ const s = {
   card: { background: "#132850", border: "1px solid #1e3a5f", borderRadius: 14, padding: 16, marginBottom: 12 },
   input: { width: "100%", padding: 12, borderRadius: 10, border: "1px solid #1e3a5f", background: "#0f2040", color: "#e8f4f8", fontSize: 15, marginBottom: 14, boxSizing: "border-box", display: "block" },
   label: { color: "#7fa8c9", fontSize: 11, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 },
-  symptomCard: (sel) => ({ background: sel ? "#00c9a730" : "#132850", borderLeft: sel ? "4px solid #00c9a7" : "4px solid transparent", borderRadius: 10, padding: "13px 14px", marginBottom: 9, cursor: "pointer", fontSize: 15 }),
+  // CHANGE 2: Smaller symptom cards, teal+tick style like Bristol
+  symptomCard: (sel) => ({
+    background: sel ? "#00c9a720" : "#132850",
+    border: sel ? "2px solid #00c9a7" : "2px solid transparent",
+    borderRadius: 10, padding: "10px 12px", marginBottom: 8,
+    cursor: "pointer", fontSize: 13,
+    display: "flex", alignItems: "center", justifyContent: "space-between",
+  }),
   bristolCard: (sel) => ({ background: sel ? "#00c9a720" : "#132850", border: sel ? "2px solid #00c9a7" : "2px solid transparent", borderRadius: 14, padding: "13px 14px", marginBottom: 9, cursor: "pointer", display: "flex", alignItems: "center", gap: 12 }),
   btn: { width: "100%", background: "#00c9a7", color: "#0a1628", border: "none", padding: 14, borderRadius: 12, fontSize: 15, fontWeight: "bold", cursor: "pointer", marginTop: 6 },
   btnOutline: { width: "100%", background: "#1e3a5f", color: "#00c9a7", border: "none", padding: 13, borderRadius: 12, fontSize: 15, fontWeight: "bold", cursor: "pointer", marginTop: 8 },
+  btnBack: { width: "100%", background: "#0f2040", color: "#7fa8c9", border: "1px solid #1e3a5f", padding: 13, borderRadius: 12, fontSize: 14, fontWeight: "bold", cursor: "pointer", marginTop: 16 },
   btnDanger: { width: "100%", background: "#ef444420", color: "#ef4444", border: "1px solid #ef444440", padding: 12, borderRadius: 12, fontSize: 14, fontWeight: "bold", cursor: "pointer", marginTop: 8 },
   btnGoogle: { width: "100%", background: "#ffffff", color: "#444444", border: "1px solid #ddd", padding: 13, borderRadius: 12, fontSize: 15, fontWeight: "bold", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 },
   result: { background: "#132850", borderLeft: "4px solid #00c9a7", borderRadius: 12, padding: 14, marginTop: 14, lineHeight: 1.8 },
@@ -183,6 +192,11 @@ const s = {
   bottomNav: { position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 500, background: "#0f2040", borderTop: "1px solid #1e3a5f", display: "flex", justifyContent: "space-around", padding: "8px 0" },
   bottomBtn: (active) => ({ background: "none", border: "none", cursor: "pointer", color: active ? "#00c9a7" : "#7fa8c9", fontSize: 9, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "3px 5px" }),
 };
+
+// ── CHANGE 6: Reusable Back to Home button ──
+const BackHomeBtn = ({ onPress }) => (
+  <button style={s.btnBack} onClick={onPress}>🏠 Back to Homepage</button>
+);
 
 export default function App() {
   const [screen, setScreen] = useState("home");
@@ -196,6 +210,7 @@ export default function App() {
   const [patientName, setPatientName] = useState("");
   const [symptoms, setSymptoms] = useState([]);
   const [submitResult, setSubmitResult] = useState("");
+  const [symptomLogs, setSymptomLogs] = useState([]); // CHANGE 1
   const [appointmentDone, setAppointmentDone] = useState(false);
   const [apptName, setApptName] = useState("");
   const [apptPhone, setApptPhone] = useState("");
@@ -203,50 +218,64 @@ export default function App() {
   const [apptType, setApptType] = useState("First Consultation");
   const [bristolSelected, setBristolSelected] = useState(null);
   const [bristolLogged, setBristolLogged] = useState(false);
-  const [bristolHistory, setBristolHistory] = useState([]);
+  const [bristolHistory, setBristolHistory] = useState([]); // CHANGE 1: now loaded from Supabase
   const [savedAppointments, setSavedAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [msgName, setMsgName] = useState("");
-  const [msgPhone, setMsgPhone] = useState("");
-  const [msgText, setMsgText] = useState("");
-  const [msgSent, setMsgSent] = useState(false);
   const [diagnosis, setDiagnosis] = useState("");
   const [selectedDiagnosis, setSelectedDiagnosis] = useState("");
   const [diagnosisSaved, setDiagnosisSaved] = useState(false);
   const [diagnosisLoading, setDiagnosisLoading] = useState(false);
   const [showDiagnosisScreen, setShowDiagnosisScreen] = useState(false);
+  // CHANGE 5: Feedback states
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackMsg, setFeedbackMsg] = useState("");
+  const [feedbackSent, setFeedbackSent] = useState(false);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
 
   const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
   const todaysTip = allHealthTips[dayOfYear % allHealthTips.length];
-  const symptomList = ["Abdominal Pain", "Bloating", "Nausea", "Diarrhea", "Constipation", "Heartburn / Acidity"];
 
   const fetchDiagnosis = useCallback(async (currentUser) => {
-    const { data } = await supabase
-      .from("patient_profiles")
-      .select("diagnosis")
-      .eq("user_id", currentUser.id)
-      .single();
-    if (data?.diagnosis) {
-      setDiagnosis(data.diagnosis);
-      setSelectedDiagnosis(data.diagnosis);
-    }
+    const { data } = await supabase.from("patient_profiles").select("diagnosis").eq("user_id", currentUser.id).single();
+    if (data?.diagnosis) { setDiagnosis(data.diagnosis); setSelectedDiagnosis(data.diagnosis); }
+  }, []);
+
+  // CHANGE 1: Load bristol and symptom logs from Supabase
+  const fetchBristolLogs = useCallback(async (currentUser) => {
+    const { data } = await supabase.from("bristol_logs").select("*").eq("user_id", currentUser.id).order("logged_at", { ascending: false }).limit(20);
+    if (data) setBristolHistory(data.map(d => ({
+      type: d.stool_type, tag: d.tag,
+      date: new Date(d.logged_at).toLocaleDateString(),
+      time: new Date(d.logged_at).toLocaleTimeString(),
+    })));
+  }, []);
+
+  const fetchSymptomLogs = useCallback(async (currentUser) => {
+    const { data } = await supabase.from("symptom_logs").select("*").eq("user_id", currentUser.id).order("logged_at", { ascending: false }).limit(20);
+    if (data) setSymptomLogs(data);
   }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) fetchDiagnosis(session.user);
+      if (session?.user) {
+        fetchDiagnosis(session.user);
+        fetchBristolLogs(session.user);
+        fetchSymptomLogs(session.user);
+      }
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) fetchDiagnosis(session.user);
+      if (session?.user) {
+        fetchDiagnosis(session.user);
+        fetchBristolLogs(session.user);
+        fetchSymptomLogs(session.user);
+      }
     });
     return () => subscription.unsubscribe();
-  }, [fetchDiagnosis]);
+  }, [fetchDiagnosis, fetchBristolLogs, fetchSymptomLogs]);
 
-  useEffect(() => {
-    if (screen === "appointments" && user) fetchAppointments();
-  }, [screen, user]);
+  useEffect(() => { if (screen === "appointments" && user) fetchAppointments(); }, [screen, user]);
 
   const fetchAppointments = async () => {
     const { data } = await supabase.from("appointments").select("*").order("created_at", { ascending: false });
@@ -256,19 +285,12 @@ export default function App() {
   const handleSaveDiagnosis = async () => {
     if (!selectedDiagnosis) return;
     setDiagnosisLoading(true);
-    const { error } = await supabase.from("patient_profiles")
-      .upsert({ user_id: user.id, diagnosis: selectedDiagnosis, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+    const { error } = await supabase.from("patient_profiles").upsert({ user_id: user.id, diagnosis: selectedDiagnosis, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
     setDiagnosisLoading(false);
-    if (!error) {
-      setDiagnosis(selectedDiagnosis);
-      setDiagnosisSaved(true);
-      setTimeout(() => { setDiagnosisSaved(false); setShowDiagnosisScreen(false); }, 1500);
-    }
+    if (!error) { setDiagnosis(selectedDiagnosis); setDiagnosisSaved(true); setTimeout(() => { setDiagnosisSaved(false); setShowDiagnosisScreen(false); }, 1500); }
   };
 
-  const handleGoogleLogin = async () => {
-    await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: "https://gastrodoc.vercel.app" } });
-  };
+  const handleGoogleLogin = async () => { await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: "https://gastrodoc.vercel.app" } }); };
 
   const handleSignUp = async () => {
     if (!authEmail || !authPassword || !authName) { setAuthError("Please fill in all fields."); return; }
@@ -276,8 +298,7 @@ export default function App() {
     setAuthLoading(true); setAuthError("");
     const { error } = await supabase.auth.signUp({ email: authEmail, password: authPassword, options: { data: { full_name: authName } } });
     setAuthLoading(false);
-    if (error) setAuthError(error.message);
-    else setAuthError("✅ Account created! Please check your email to verify, then log in.");
+    if (error) setAuthError(error.message); else setAuthError("✅ Account created! Please check your email to verify, then log in.");
   };
 
   const handleLogin = async () => {
@@ -291,14 +312,21 @@ export default function App() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null); setScreen("home"); setDiagnosis(""); setSelectedDiagnosis("");
+    setBristolHistory([]); setSymptomLogs([]);
   };
 
-  const toggleSymptom = (s) => setSymptoms(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+  const toggleSymptom = (sym) => setSymptoms(prev => prev.includes(sym) ? prev.filter(x => x !== sym) : [...prev, sym]);
 
-  const handleSubmit = () => {
+  // CHANGE 1: Save symptom log to Supabase
+  const handleSubmit = async () => {
     if (!patientName) { setSubmitResult("⚠️ Please enter your name first."); return; }
-    if (symptoms.length === 0) setSubmitResult("✅ " + patientName + ", no symptoms. All clear!");
-    else if (symptoms.length <= 2) setSubmitResult("⚠️ " + patientName + ", mild symptoms: " + symptoms.join(", ") + ". Monitor closely.");
+    if (symptoms.length === 0) { setSubmitResult("✅ " + patientName + ", no symptoms. All clear!"); return; }
+    // Save to Supabase
+    if (user) {
+      await supabase.from("symptom_logs").insert([{ user_id: user.id, symptoms }]);
+      fetchSymptomLogs(user);
+    }
+    if (symptoms.length <= 2) setSubmitResult("⚠️ " + patientName + ", mild symptoms: " + symptoms.join(", ") + ". Monitor closely.");
     else setSubmitResult("🚨 " + patientName + " has " + symptoms.length + " symptoms: " + symptoms.join(", ") + ". Please book an appointment with " + clinic.doctor + "!");
   };
 
@@ -310,16 +338,24 @@ export default function App() {
     if (error) alert("Error: " + error.message); else setAppointmentDone(true);
   };
 
-  const handleBristolLog = () => {
+  // CHANGE 1: Save bristol log to Supabase
+  const handleBristolLog = async () => {
     if (!bristolSelected) return;
-    setBristolHistory(prev => [{ type: bristolSelected.type, tag: bristolSelected.tag, time: new Date().toLocaleTimeString(), date: new Date().toLocaleDateString() }, ...prev]);
+    if (user) {
+      await supabase.from("bristol_logs").insert([{ user_id: user.id, stool_type: bristolSelected.type, tag: bristolSelected.tag }]);
+      fetchBristolLogs(user);
+    }
     setBristolLogged(true);
     setTimeout(() => { setBristolLogged(false); setBristolSelected(null); }, 2000);
   };
 
-  const handleMessage = () => {
-    if (!msgName || !msgPhone || !msgText) { alert("Please fill in all fields."); return; }
-    setMsgSent(true);
+  // CHANGE 5: Save feedback to Supabase
+  const handleFeedbackSubmit = async () => {
+    if (feedbackRating === 0) { alert("Please select a star rating."); return; }
+    setFeedbackLoading(true);
+    const { error } = await supabase.from("feedback").insert([{ user_id: user.id, rating: feedbackRating, message: feedbackMsg }]);
+    setFeedbackLoading(false);
+    if (!error) setFeedbackSent(true);
   };
 
   const navScreens = [
@@ -329,15 +365,14 @@ export default function App() {
     { id: "appointments", icon: "📅", label: "Appts" },
     { id: "videos", icon: "▶️", label: "Videos" },
     { id: "contact", icon: "💬", label: "Contact" },
+    { id: "feedback", icon: "⭐", label: "Feedback" },
   ];
 
   // ── AUTH SCREEN ──
   if (!user) {
     return (
       <div style={s.app}>
-        <div style={s.navbar}>
-          <div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div>
-        </div>
+        <div style={s.navbar}><div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div></div>
         <div style={s.page}>
           <div style={{ textAlign: "center", padding: "20px 0 28px" }}>
             <p style={{ fontSize: 48, margin: "0 0 12px" }}>🩺</p>
@@ -375,9 +410,7 @@ export default function App() {
   if (showDiagnosisScreen) {
     return (
       <div style={s.app}>
-        <div style={s.navbar}>
-          <div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div>
-        </div>
+        <div style={s.navbar}><div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div></div>
         <div style={s.page}>
           <h2 style={s.title}>My Diagnosis 🏥</h2>
           <p style={s.subtitle}>Select your condition so we can personalise your health tips</p>
@@ -390,7 +423,7 @@ export default function App() {
           ))}
           {diagnosisSaved && (<div style={{ ...s.success, textAlign: "center", marginBottom: 10 }}>✅ Diagnosis saved successfully!</div>)}
           <button style={s.btn} onClick={handleSaveDiagnosis} disabled={diagnosisLoading || !selectedDiagnosis}>{diagnosisLoading ? "Saving..." : "Save My Diagnosis"}</button>
-          <button style={s.btnOutline} onClick={() => setShowDiagnosisScreen(false)}>← Back to Home</button>
+          <button style={s.btnBack} onClick={() => setShowDiagnosisScreen(false)}>🏠 Back to Homepage</button>
         </div>
       </div>
     );
@@ -406,7 +439,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* HOME */}
+      {/* ── HOME ── */}
       {screen === "home" && (
         <div style={s.page}>
           <h2 style={s.title}>Welcome 👋</h2>
@@ -415,25 +448,9 @@ export default function App() {
           {/* DOCTOR CARD */}
           <div style={{ ...s.card, background: "linear-gradient(135deg,#0d2d50,#0a1f3a)" }}>
             <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-
-              {/* ── FIXED: Rectangle photo, full image visible, teal border, no duplicate objectFit ── */}
-              <img
-                src="/dr-vivek.png.jpg"
-                alt="Dr. Vivek Shirol"
-                style={{
-                  width: 100,
-                  height: 130,
-                  objectFit: "contain",
-                  objectPosition: "center top",
-                  borderRadius: 10,
-                  border: "3px solid #00c9a7",
-                  boxShadow: "0 0 12px #00c9a740",
-                  flexShrink: 0,
-                  background: "#0a1628",
-                }}
-              />
-
-              {/* Doctor details */}
+              <div style={{ flexShrink: 0, width: 110, border: "3px solid #00c9a7", borderRadius: 10, boxShadow: "0 0 14px #00c9a750", overflow: "hidden", background: "#b8cdd8" }}>
+                <img src="/dr-vivek.png.jpg" alt="Dr. Vivek Shirol" style={{ width: "100%", height: "auto", display: "block" }} />
+              </div>
               <div style={{ flex: 1 }}>
                 <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 15, margin: "0 0 3px" }}>👨‍⚕️ {clinic.doctor}</p>
                 <p style={{ color: "#e8f4f8", fontSize: 11, margin: "0 0 6px", lineHeight: 1.4 }}>{clinic.quals}</p>
@@ -472,29 +489,50 @@ export default function App() {
           <button style={s.btnOutline} onClick={() => setScreen("appointments")}>📅 Book Appointment</button>
           <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("bristol")}>💧 Bristol Stool Tracker</button>
           <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("videos")}>▶️ Watch Health Videos</button>
-          <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("contact")}>💬 Contact / Message Us</button>
+          <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("contact")}>💬 Contact Us</button>
+          <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("feedback")}>⭐ Give Feedback</button>
           <button style={s.btnDanger} onClick={handleLogout}>🚪 Sign Out</button>
         </div>
       )}
 
-      {/* SYMPTOMS */}
+      {/* ── SYMPTOMS ── */}
       {screen === "symptoms" && (
         <div style={s.page}>
           <h2 style={s.title}>Symptom Checker</h2>
           <p style={s.subtitle}>Select all symptoms you are experiencing today</p>
           <label style={s.label}>Your Name</label>
           <input style={s.input} placeholder="Enter your full name" value={patientName} onChange={e => setPatientName(e.target.value)} />
-          {symptomList.map(sym => (
-            <div key={sym} style={s.symptomCard(symptoms.includes(sym))} onClick={() => toggleSymptom(sym)}>
-              {symptoms.includes(sym) ? "☑" : "☐"} {sym}
-            </div>
-          ))}
-          <button style={s.btn} onClick={handleSubmit}>Submit Symptoms</button>
+
+          {/* CHANGE 2: New symptom grid, smaller, teal+tick style */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+            {symptomList.map(sym => (
+              <div key={sym} onClick={() => toggleSymptom(sym)}
+                style={{ background: symptoms.includes(sym) ? "#00c9a720" : "#132850", border: symptoms.includes(sym) ? "2px solid #00c9a7" : "2px solid #1e3a5f", borderRadius: 10, padding: "8px 12px", cursor: "pointer", fontSize: 12, color: symptoms.includes(sym) ? "#00c9a7" : "#e8f4f8", display: "flex", alignItems: "center", gap: 6, fontWeight: symptoms.includes(sym) ? "bold" : "normal" }}>
+                {symptoms.includes(sym) ? "✓" : ""} {sym}
+              </div>
+            ))}
+          </div>
+
+          <button style={s.btn} onClick={handleSubmit}>Submit & Save Symptoms</button>
           {submitResult && <div style={s.result}>{submitResult}</div>}
+
+          {/* CHANGE 1: Past symptom logs from Supabase */}
+          {symptomLogs.length > 0 && (
+            <div style={{ marginTop: 20 }}>
+              <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 10 }}>📅 PAST SYMPTOM LOGS</p>
+              {symptomLogs.map((log, i) => (
+                <div key={i} style={s.card}>
+                  <p style={{ color: "#e8f4f8", fontSize: 13, margin: "0 0 4px" }}>{log.symptoms?.join(", ")}</p>
+                  <p style={{ color: "#7fa8c9", fontSize: 11, margin: 0 }}>{new Date(log.logged_at).toLocaleDateString()} at {new Date(log.logged_at).toLocaleTimeString()}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          <BackHomeBtn onPress={() => setScreen("home")} />
         </div>
       )}
 
-      {/* BRISTOL */}
+      {/* ── BRISTOL ── */}
       {screen === "bristol" && (
         <div style={s.page}>
           <h2 style={s.title}>Bristol Stool Chart</h2>
@@ -513,16 +551,24 @@ export default function App() {
             </div>
           ))}
           {bristolSelected && (<button style={s.btn} onClick={handleBristolLog}>{bristolLogged ? "✅ Logged!" : "Log This Entry"}</button>)}
+
+          {/* CHANGE 1: Past bristol logs from Supabase */}
           {bristolHistory.length > 0 && (
             <div style={{ marginTop: 20 }}>
-              <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 10 }}>RECENT LOGS</p>
-              {bristolHistory.map((h, i) => (<div key={i} style={s.card}><p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 2px" }}>Type {h.type} — {h.tag}</p><p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>{h.date} at {h.time}</p></div>))}
+              <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 10 }}>📅 PAST LOGS</p>
+              {bristolHistory.map((h, i) => (
+                <div key={i} style={s.card}>
+                  <p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 2px" }}>Type {h.type} — {h.tag}</p>
+                  <p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>{h.date} at {h.time}</p>
+                </div>
+              ))}
             </div>
           )}
+          <BackHomeBtn onPress={() => setScreen("home")} />
         </div>
       )}
 
-      {/* APPOINTMENTS */}
+      {/* ── APPOINTMENTS ── */}
       {screen === "appointments" && (
         <div style={s.page}>
           <h2 style={s.title}>Book Appointment</h2>
@@ -554,10 +600,11 @@ export default function App() {
               {savedAppointments.map((a, i) => (<div key={i} style={s.card}><p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 3px" }}>👤 {a.patient_name}</p><p style={{ color: "#7fa8c9", fontSize: 12, margin: "0 0 2px" }}>📅 {a.date} · {a.visit_type}</p><p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>📞 {a.phone}</p></div>))}
             </div>
           )}
+          <BackHomeBtn onPress={() => setScreen("home")} />
         </div>
       )}
 
-      {/* VIDEOS */}
+      {/* ── VIDEOS ── */}
       {screen === "videos" && (
         <div style={s.page}>
           <h2 style={s.title}>Health Videos ▶️</h2>
@@ -574,14 +621,15 @@ export default function App() {
               </div>
             </div>
           ))}
+          <BackHomeBtn onPress={() => setScreen("home")} />
         </div>
       )}
 
-      {/* CONTACT */}
+      {/* ── CONTACT (CHANGE 4: removed redundant message form, kept WhatsApp + Call) ── */}
       {screen === "contact" && (
         <div style={s.page}>
           <h2 style={s.title}>Contact Us 💬</h2>
-          <p style={s.subtitle}>Send us a message or query</p>
+          <p style={s.subtitle}>Reach out to us directly</p>
           <div style={s.card}>
             <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 14, margin: "0 0 10px" }}>🏥 {clinic.clinic}</p>
             <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 5px" }}>📍 {clinic.address}</p>
@@ -589,24 +637,72 @@ export default function App() {
             <p style={{ color: "#00c9a7", fontSize: 13, margin: "0 0 3px", fontWeight: "bold" }}>🕐 {clinic.timings}</p>
             <p style={{ color: "#ef4444", fontSize: 12, margin: 0 }}>🔴 {clinic.holiday}</p>
           </div>
-          <a href={"https://wa.me/91" + clinic.phone.replace(/\D/g, "")} target="_blank" rel="noreferrer" style={{ display: "block", background: "#25D366", color: "#fff", textAlign: "center", padding: 14, borderRadius: 12, fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 10 }}>💬 WhatsApp Us</a>
-          <a href={"tel:" + clinic.phone} style={{ display: "block", background: "#1e3a5f", color: "#00c9a7", textAlign: "center", padding: 13, borderRadius: 12, fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 16 }}>📞 Call Clinic</a>
-          {!msgSent ? (
+
+          {/* CHANGE 3: WhatsApp links to correct number */}
+          <a href="https://wa.me/918310417749" target="_blank" rel="noreferrer"
+            style={{ display: "block", background: "#25D366", color: "#fff", textAlign: "center", padding: 14, borderRadius: 12, fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 10 }}>
+            💬 WhatsApp Us
+          </a>
+          <a href="tel:+918310417749"
+            style={{ display: "block", background: "#1e3a5f", color: "#00c9a7", textAlign: "center", padding: 13, borderRadius: 12, fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 10 }}>
+            📞 Call Clinic
+          </a>
+
+          <div style={{ ...s.card, textAlign: "center", marginTop: 8 }}>
+            <p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>💡 For queries and questions, tap WhatsApp above to chat directly with Dr. Vivek's team.</p>
+          </div>
+
+          <BackHomeBtn onPress={() => setScreen("home")} />
+        </div>
+      )}
+
+      {/* ── CHANGE 5: FEEDBACK SCREEN ── */}
+      {screen === "feedback" && (
+        <div style={s.page}>
+          <h2 style={s.title}>Give Feedback ⭐</h2>
+          <p style={s.subtitle}>Help Dr. Vivek improve by sharing your experience</p>
+
+          {!feedbackSent ? (
             <>
-              <label style={s.label}>Your Name</label><input style={s.input} placeholder="Your full name" value={msgName} onChange={e => setMsgName(e.target.value)} />
-              <label style={s.label}>Phone Number</label><input style={s.input} placeholder="+91 XXXXX XXXXX" value={msgPhone} onChange={e => setMsgPhone(e.target.value)} />
-              <label style={s.label}>Your Query / Message</label>
-              <textarea style={{ ...s.input, height: 100, resize: "none" }} placeholder="Type your question..." value={msgText} onChange={e => setMsgText(e.target.value)} />
-              <button style={s.btn} onClick={handleMessage}>Send Message</button>
+              {/* Star Rating */}
+              <div style={s.card}>
+                <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 12 }}>RATE YOUR CONSULTATION</p>
+                <div style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 8 }}>
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <span key={star} onClick={() => setFeedbackRating(star)}
+                      style={{ fontSize: 36, cursor: "pointer", color: star <= feedbackRating ? "#f59e0b" : "#1e3a5f", transition: "color 0.15s" }}>
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <p style={{ color: "#7fa8c9", fontSize: 12, textAlign: "center", margin: 0 }}>
+                  {feedbackRating === 0 ? "Tap a star to rate" : feedbackRating === 5 ? "Excellent! 🎉" : feedbackRating === 4 ? "Very Good 😊" : feedbackRating === 3 ? "Good 🙂" : feedbackRating === 2 ? "Fair 😐" : "Poor 😞"}
+                </p>
+              </div>
+
+              {/* Message Box */}
+              <label style={s.label}>Your Feedback (optional)</label>
+              <textarea
+                style={{ ...s.input, height: 120, resize: "none" }}
+                placeholder="Share your experience, suggestions or any concerns..."
+                value={feedbackMsg}
+                onChange={e => setFeedbackMsg(e.target.value)}
+              />
+
+              <button style={s.btn} onClick={handleFeedbackSubmit} disabled={feedbackLoading || feedbackRating === 0}>
+                {feedbackLoading ? "Submitting..." : "Submit Feedback"}
+              </button>
             </>
           ) : (
-            <div style={s.success}>
-              <p style={{ fontSize: 32, margin: "0 0 8px" }}>✅</p>
-              <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 16, margin: "0 0 6px" }}>Message Received!</p>
-              <p style={{ color: "#7fa8c9", fontSize: 13, margin: 0 }}>{clinic.doctor}'s team will contact you on {msgPhone} shortly.</p>
-              <button style={{ ...s.btn, marginTop: 14 }} onClick={() => { setMsgSent(false); setMsgName(""); setMsgPhone(""); setMsgText(""); }}>Send Another</button>
+            <div style={{ ...s.success, textAlign: "center" }}>
+              <p style={{ fontSize: 48, margin: "0 0 12px" }}>🙏</p>
+              <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 18, margin: "0 0 8px" }}>Thank you!</p>
+              <p style={{ color: "#7fa8c9", fontSize: 13, margin: 0 }}>Your feedback has been shared with {clinic.doctor}. It means a lot!</p>
+              <button style={{ ...s.btn, marginTop: 14 }} onClick={() => { setFeedbackSent(false); setFeedbackRating(0); setFeedbackMsg(""); }}>Submit Another</button>
             </div>
           )}
+
+          <BackHomeBtn onPress={() => setScreen("home")} />
         </div>
       )}
 
