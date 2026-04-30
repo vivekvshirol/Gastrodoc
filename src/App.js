@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -32,7 +32,6 @@ const bristolTypes = [
   { type: 7, emoji: "🔴", desc: "Entirely liquid", tag: "Diarrhea", color: "#ef4444" },
 ];
 
-// ── 110 Daily Tips (rotates every day) ──
 const allHealthTips = [
   { tip: "🍽️ Do not lie down for at least 2–3 hours after eating. Staying upright uses gravity to keep stomach acid down where it belongs.", ref: "Stanford Digestive Health Center — Nutrition Guidelines for GERD (2012)" },
   { tip: "🥗 Eat 4–5 small meals spread through the day instead of 2–3 large ones. Large meals fill the stomach and push acid back up into the food pipe.", ref: "Stanford Digestive Health Center — Nutrition Guidelines for GERD (2012)" },
@@ -97,13 +96,13 @@ const allHealthTips = [
   { tip: "🧂 Reduce added salt and sugar daily. Both are major components of ultra-processed foods and have been linked to worsening gut inflammation in IBD.", ref: "Hashash JG et al. — AGA Clinical Practice Update. Gastroenterology (2024)" },
   { tip: "👨‍⚕️ Work with a registered dietitian alongside your gastroenterologist. Dietary needs in IBD change with disease activity, nutritional status, and medications — personalised guidance is essential.", ref: "Hashash JG et al. — AGA Clinical Practice Update. Gastroenterology (2024)" },
   { tip: "⚖️ Losing 7–10% of your total body weight is the most effective treatment for fatty liver. Even 5% weight loss improves liver fat. Aim for a steady 500g–1kg loss per week.", ref: "MNGI Digestive Health — Fatty Liver Diet Guidelines (2019); Montemayor S et al. — Nutrients 2023, 15, 3987" },
-  { tip: "🚶 Do at least 20–30 minutes of moderate aerobic exercise daily — brisk walking, cycling, or swimming. Exercise reduces liver fat directly, even without significant weight loss.", ref: "MNGI Digestive Health — Fatty Liver Diet Guidelines (2019); Montemayor S et al. — Nutrients (2023)" },
+  { tip: "🚶 Do at least 20–30 minutes of moderate aerobic exercise daily — brisk walking, cycling, or swimming. Exercise reduces liver fat directly, even without significant weight loss.", ref: "MNGI Digestive Health — Fatty Liver Diet Guidelines (2019)" },
   { tip: "💪 Add strength training 2–3 days per week. Building muscle mass improves insulin sensitivity — a key driver in reversing fatty liver disease.", ref: "MNGI Digestive Health — Fatty Liver Diet Guidelines (2019)" },
   { tip: "🥤 Stop all sugar-sweetened drinks immediately — cold drinks, packaged juices, energy drinks. Fructose in these drinks directly converts to fat in the liver, even in people of normal weight.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987; EASL–EASD–EASO and APASL Guidelines" },
-  { tip: "🍚 Avoid refined carbohydrates — white rice, maida, white bread, and sugary snacks. These are rapidly converted to fat in the liver. Choose whole grain alternatives.", ref: "MNGI Digestive Health — Fatty Liver Diet Guidelines (2019); Montemayor S et al. — Nutrients (2023)" },
+  { tip: "🍚 Avoid refined carbohydrates — white rice, maida, white bread, and sugary snacks. These are rapidly converted to fat in the liver. Choose whole grain alternatives.", ref: "MNGI Digestive Health — Fatty Liver Diet Guidelines (2019)" },
   { tip: "🚫 Avoid alcohol completely if you have fatty liver disease. Even small amounts worsen liver inflammation and accelerate scarring. Total abstinence is recommended for NASH.", ref: "MNGI Digestive Health — Fatty Liver Diet Guidelines (2019); EASL–EASD–EASO Guidelines" },
   { tip: "🫒 Use extra virgin olive oil as your main cooking fat. It is rich in monounsaturated fatty acids and polyphenols that reduce liver fat and improve insulin sensitivity in NAFLD.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987 (Mediterranean NAFLD Plate)" },
-  { tip: "☕ Drinking 2–3 cups of plain black coffee (no sugar) per day appears to protect the liver. Regular coffee drinkers have lower rates of liver fibrosis and slower NAFLD progression.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987; APASL Guidelines; EASL–EASD–EASO Guidelines" },
+  { tip: "☕ Drinking 2–3 cups of plain black coffee (no sugar) per day appears to protect the liver. Regular coffee drinkers have lower rates of liver fibrosis and slower NAFLD progression.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987; APASL Guidelines" },
   { tip: "🐟 Eat fatty fish like salmon, mackerel, or sardines 2–3 times per week. Their omega-3 fatty acids directly reduce liver inflammation and fat accumulation.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987 (Mediterranean NAFLD Plate)" },
   { tip: "🌈 Eat colourful vegetables and fruits daily — especially orange, red, and purple varieties. Carotenoids and antioxidants reduce oxidative stress and protect liver cells from damage.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987 (Mediterranean NAFLD Plate)" },
   { tip: "🥜 Include nuts, seeds, and legumes regularly. Walnuts, almonds, flaxseeds, lentils, and chickpeas provide healthy fats, fibre, and plant protein that support liver health.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987 (Mediterranean NAFLD Plate)" },
@@ -115,7 +114,7 @@ const allHealthTips = [
   { tip: "😴 Poor sleep directly worsens fatty liver disease. Research links short sleep duration and poor sleep quality with increased NAFLD severity. Aim for 7–8 hours of quality sleep nightly.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987; Kim CW et al. — J Hepatol (2013)" },
   { tip: "😮‍💨 If you snore heavily or feel excessively sleepy during the day, get screened for obstructive sleep apnoea. Sleep apnoea is directly associated with worse NAFLD and faster liver scarring.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987; Musso G et al. — Obes Rev (2013)" },
   { tip: "🌾 Increase dietary fibre intake — whole grain cereals, oats, fruits, and vegetables daily. Dietary fibre positively influences the gut microbiome, which plays a proven role in regulating liver fat.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987" },
-  { tip: "🫒 The Mediterranean diet is officially recommended for NAFLD by EASL, EASD, EASO, ESPEN, and APASL. It reduces liver fat and improves insulin sensitivity even without significant weight loss.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987; EASL–EASD–EASO Joint Guidelines; ESPEN Guidelines" },
+  { tip: "🫒 The Mediterranean diet is officially recommended for NAFLD by EASL, EASD, EASO, ESPEN, and APASL. It reduces liver fat and improves insulin sensitivity even without significant weight loss.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987; EASL–EASD–EASO Joint Guidelines" },
   { tip: "🧪 Even if you are not overweight (lean NAFLD), fatty liver disease can still be severe. Dietary quality — not just body weight — is what matters most for protecting your liver.", ref: "Montemayor S et al. — Nutrients 2023, 15, 3987" },
   { tip: "📉 A calorie deficit of 500 calories per day is the recommended approach for weight loss in NAFLD. This achieves safe, steady weight loss without nutritional deficiencies or muscle loss.", ref: "MNGI Digestive Health — Fatty Liver Diet Guidelines (2019); EASL–EASD–EASO Guidelines" },
   { tip: "🌾 Gradually increase fibre in your diet — fruits, vegetables, whole grains, and oats. Fibre bulks up stools and speeds transit through the gut. Add it slowly to avoid gas and bloating.", ref: "Cabré E. — Nutrition in Prevention and Management of Constipation. European e-Journal of Clinical Nutrition and Metabolism (2011)" },
@@ -137,7 +136,7 @@ const allHealthTips = [
   { tip: "🦠 Your gut microbiome — trillions of bacteria in your intestine — is central to digestive health. Eat a wide variety of plant foods, include curd and buttermilk, and avoid ultra-processed foods.", ref: "Cabré E. — European e-Journal of Clinical Nutrition and Metabolism (2011); Montemayor S et al. — Nutrients (2023)" },
   { tip: "🚭 Smoking damages the entire digestive tract — it worsens GERD, increases IBD flares, accelerates fatty liver, and raises gut cancer risk. Quitting is the most impactful lifestyle change for gut health.", ref: "Hashash JG et al. — AGA Clinical Practice Update. Gastroenterology (2024)" },
   { tip: "🍱 Eat slowly, chew thoroughly, and sit down for every meal. Rushing food leads to air swallowing, poor digestion, and bloating — all avoidable with good eating habits.", ref: "Hashash JG et al. — AGA Clinical Practice Update. Gastroenterology (2024)" },
-  { tip: "📵 Ultra-processed foods — packaged snacks, instant noodles, biscuits, fast food — contain emulsifiers and additives that disrupt the gut lining and microbiome. Cook at home with whole ingredients as much as possible.", ref: "Hashash JG et al. — AGA Clinical Practice Update. Gastroenterology (2024); Montemayor S et al. — Nutrients (2023)" },
+  { tip: "📵 Ultra-processed foods — packaged snacks, instant noodles, biscuits, fast food — contain emulsifiers and additives that disrupt the gut lining and microbiome. Cook at home with whole ingredients as much as possible.", ref: "Hashash JG et al. — AGA Clinical Practice Update. Gastroenterology (2024)" },
   { tip: "💊 Never self-medicate with antacids, laxatives, or antibiotics for prolonged periods. Long-term unsupervised use can mask serious disease and harm the gut. Always consult your gastroenterologist.", ref: "ASGE Patient Education — Diet and GERD (2014); Cabré E. — European e-Journal (2011)" },
   { tip: "🌙 Prioritise good sleep — 7–8 hours nightly. Poor sleep quality is linked to worsened GERD, IBS flares, IBD activity, and fatty liver progression. Your gut repairs and resets during deep sleep.", ref: "Montemayor S et al. — Nutrients (2023)" },
   { tip: "😰 Chronic stress is a gut enemy. It worsens GERD, triggers IBS flares, promotes IBD activity, and worsens fatty liver through elevated cortisol. Stress management is a legitimate medical treatment for gut disease.", ref: "Cabré E. — European e-Journal (2011); Hashash JG et al. — AGA (2024)" },
@@ -145,7 +144,6 @@ const allHealthTips = [
   { tip: "🩺 Do not ignore persistent gut symptoms — blood in stool, unexplained weight loss, pain that wakes you at night, or worsening symptoms. These always need proper medical evaluation. Early diagnosis saves lives.", ref: "ASGE Patient Education — Diet and GERD (2014); Hashash JG et al. — AGA (2024)" },
 ];
 
-// ── Diagnosis options ──
 const diagnosisList = [
   "GERD / Acid Reflux",
   "IBS (Irritable Bowel Syndrome)",
@@ -212,49 +210,51 @@ export default function App() {
   const [msgPhone, setMsgPhone] = useState("");
   const [msgText, setMsgText] = useState("");
   const [msgSent, setMsgSent] = useState(false);
-
-  // ── Diagnosis states ──
   const [diagnosis, setDiagnosis] = useState("");
   const [selectedDiagnosis, setSelectedDiagnosis] = useState("");
   const [diagnosisSaved, setDiagnosisSaved] = useState(false);
   const [diagnosisLoading, setDiagnosisLoading] = useState(false);
   const [showDiagnosisScreen, setShowDiagnosisScreen] = useState(false);
 
-  // ── Daily tip: rotates every calendar day through all 110 tips ──
   const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
   const todaysTip = allHealthTips[dayOfYear % allHealthTips.length];
-
   const symptomList = ["Abdominal Pain", "Bloating", "Nausea", "Diarrhea", "Constipation", "Heartburn / Acidity"];
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (screen === "appointments" && user) fetchAppointments();
-  }, [screen, user]);
-
-  // ── Load saved diagnosis when user logs in ──
-  useEffect(() => {
-    if (user) fetchDiagnosis();
-  }, [user]);
-
-  const fetchDiagnosis = async () => {
+  // ── fetchDiagnosis defined with useCallback BEFORE useEffect ──
+  const fetchDiagnosis = useCallback(async (currentUser) => {
     const { data } = await supabase
       .from("patient_profiles")
       .select("diagnosis")
-      .eq("user_id", user.id)
+      .eq("user_id", currentUser.id)
       .single();
     if (data?.diagnosis) {
       setDiagnosis(data.diagnosis);
       setSelectedDiagnosis(data.diagnosis);
     }
+  }, []);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchDiagnosis(session.user);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchDiagnosis(session.user);
+    });
+    return () => subscription.unsubscribe();
+  }, [fetchDiagnosis]);
+
+  useEffect(() => {
+    if (screen === "appointments" && user) fetchAppointments();
+  }, [screen, user]);
+
+  const fetchAppointments = async () => {
+    const { data } = await supabase
+      .from("appointments")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setSavedAppointments(data);
   };
 
   const handleSaveDiagnosis = async () => {
@@ -271,14 +271,6 @@ export default function App() {
     }
   };
 
-  const fetchAppointments = async () => {
-    const { data } = await supabase
-      .from("appointments")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (data) setSavedAppointments(data);
-  };
-
   const handleGoogleLogin = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -291,8 +283,7 @@ export default function App() {
     if (authPassword.length < 6) { setAuthError("Password must be at least 6 characters."); return; }
     setAuthLoading(true); setAuthError("");
     const { error } = await supabase.auth.signUp({
-      email: authEmail,
-      password: authPassword,
+      email: authEmail, password: authPassword,
       options: { data: { full_name: authName } }
     });
     setAuthLoading(false);
@@ -303,19 +294,14 @@ export default function App() {
   const handleLogin = async () => {
     if (!authEmail || !authPassword) { setAuthError("Please enter email and password."); return; }
     setAuthLoading(true); setAuthError("");
-    const { error } = await supabase.auth.signInWithPassword({
-      email: authEmail, password: authPassword
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
     setAuthLoading(false);
     if (error) setAuthError("❌ " + error.message);
   };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null);
-    setScreen("home");
-    setDiagnosis("");
-    setSelectedDiagnosis("");
+    setUser(null); setScreen("home"); setDiagnosis(""); setSelectedDiagnosis("");
   };
 
   const toggleSymptom = (s) => {
@@ -324,24 +310,17 @@ export default function App() {
 
   const handleSubmit = () => {
     if (!patientName) { setSubmitResult("⚠️ Please enter your name first."); return; }
-    if (symptoms.length === 0) {
-      setSubmitResult("✅ " + patientName + ", no symptoms. All clear!");
-    } else if (symptoms.length <= 2) {
-      setSubmitResult("⚠️ " + patientName + ", mild symptoms: " + symptoms.join(", ") + ". Monitor closely.");
-    } else {
-      setSubmitResult("🚨 " + patientName + " has " + symptoms.length + " symptoms: " + symptoms.join(", ") + ". Please book an appointment with " + clinic.doctor + "!");
-    }
+    if (symptoms.length === 0) setSubmitResult("✅ " + patientName + ", no symptoms. All clear!");
+    else if (symptoms.length <= 2) setSubmitResult("⚠️ " + patientName + ", mild symptoms: " + symptoms.join(", ") + ". Monitor closely.");
+    else setSubmitResult("🚨 " + patientName + " has " + symptoms.length + " symptoms: " + symptoms.join(", ") + ". Please book an appointment with " + clinic.doctor + "!");
   };
 
   const handleAppointment = async () => {
     if (!apptName || !apptPhone || !apptDate) { alert("Please fill in all fields."); return; }
     setLoading(true);
-    const { error } = await supabase.from("appointments").insert([{
-      patient_name: apptName, phone: apptPhone, date: apptDate, visit_type: apptType,
-    }]);
+    const { error } = await supabase.from("appointments").insert([{ patient_name: apptName, phone: apptPhone, date: apptDate, visit_type: apptType }]);
     setLoading(false);
-    if (error) alert("Error: " + error.message);
-    else setAppointmentDone(true);
+    if (error) alert("Error: " + error.message); else setAppointmentDone(true);
   };
 
   const handleBristolLog = () => {
@@ -370,22 +349,14 @@ export default function App() {
     return (
       <div style={s.app}>
         <div style={s.navbar}>
-          <div>
-            <div style={s.logo}>🩺 GastroDoc</div>
-            <div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div>
-          </div>
+          <div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div>
         </div>
         <div style={s.page}>
           <div style={{ textAlign: "center", padding: "20px 0 28px" }}>
             <p style={{ fontSize: 48, margin: "0 0 12px" }}>🩺</p>
-            <h2 style={{ color: "#00c9a7", fontSize: 22, margin: "0 0 6px" }}>
-              {authMode === "login" ? "Welcome Back!" : "Create Account"}
-            </h2>
-            <p style={{ color: "#7fa8c9", fontSize: 13, margin: 0 }}>
-              {authMode === "login" ? "Sign in to access your health portal" : "Join Dr. Vivek's patient portal"}
-            </p>
+            <h2 style={{ color: "#00c9a7", fontSize: 22, margin: "0 0 6px" }}>{authMode === "login" ? "Welcome Back!" : "Create Account"}</h2>
+            <p style={{ color: "#7fa8c9", fontSize: 13, margin: 0 }}>{authMode === "login" ? "Sign in to access your health portal" : "Join Dr. Vivek's patient portal"}</p>
           </div>
-
           <button style={s.btnGoogle} onClick={handleGoogleLogin}>
             <svg width="20" height="20" viewBox="0 0 48 48">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -395,43 +366,15 @@ export default function App() {
             </svg>
             Continue with Google
           </button>
-
-          <div style={s.divider}>
-            <div style={s.dividerLine}></div>
-            <span style={s.dividerText}>or use email</span>
-            <div style={s.dividerLine}></div>
-          </div>
-
-          {authMode === "signup" && (
-            <>
-              <label style={s.label}>Full Name</label>
-              <input style={s.input} placeholder="Your full name"
-                value={authName} onChange={e => setAuthName(e.target.value)} />
-            </>
-          )}
-
+          <div style={s.divider}><div style={s.dividerLine}></div><span style={s.dividerText}>or use email</span><div style={s.dividerLine}></div></div>
+          {authMode === "signup" && (<><label style={s.label}>Full Name</label><input style={s.input} placeholder="Your full name" value={authName} onChange={e => setAuthName(e.target.value)} /></>)}
           <label style={s.label}>Email Address</label>
-          <input style={s.input} placeholder="your@email.com" type="email"
-            value={authEmail} onChange={e => setAuthEmail(e.target.value)} />
-
+          <input style={s.input} placeholder="your@email.com" type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} />
           <label style={s.label}>Password</label>
-          <input style={s.input} placeholder="Min 6 characters" type="password"
-            value={authPassword} onChange={e => setAuthPassword(e.target.value)} />
-
-          {authError && (
-            <div style={{ background: authError.startsWith("✅") ? "#00c9a720" : "#ef444420", border: `1px solid ${authError.startsWith("✅") ? "#00c9a7" : "#ef4444"}40`, borderRadius: 10, padding: "10px 14px", marginBottom: 14, fontSize: 13, color: authError.startsWith("✅") ? "#00c9a7" : "#ef4444" }}>
-              {authError}
-            </div>
-          )}
-
-          <button style={s.btn} onClick={authMode === "login" ? handleLogin : handleSignUp} disabled={authLoading}>
-            {authLoading ? "Please wait..." : authMode === "login" ? "Sign In" : "Create Account"}
-          </button>
-
-          <button style={s.btnOutline} onClick={() => { setAuthMode(authMode === "login" ? "signup" : "login"); setAuthError(""); }}>
-            {authMode === "login" ? "New patient? Create Account" : "Already have account? Sign In"}
-          </button>
-
+          <input style={s.input} placeholder="Min 6 characters" type="password" value={authPassword} onChange={e => setAuthPassword(e.target.value)} />
+          {authError && (<div style={{ background: authError.startsWith("✅") ? "#00c9a720" : "#ef444420", border: `1px solid ${authError.startsWith("✅") ? "#00c9a7" : "#ef4444"}40`, borderRadius: 10, padding: "10px 14px", marginBottom: 14, fontSize: 13, color: authError.startsWith("✅") ? "#00c9a7" : "#ef4444" }}>{authError}</div>)}
+          <button style={s.btn} onClick={authMode === "login" ? handleLogin : handleSignUp} disabled={authLoading}>{authLoading ? "Please wait..." : authMode === "login" ? "Sign In" : "Create Account"}</button>
+          <button style={s.btnOutline} onClick={() => { setAuthMode(authMode === "login" ? "signup" : "login"); setAuthError(""); }}>{authMode === "login" ? "New patient? Create Account" : "Already have account? Sign In"}</button>
           <div style={{ ...s.card, marginTop: 20, textAlign: "center" }}>
             <p style={{ color: "#7fa8c9", fontSize: 12, margin: "0 0 4px" }}>🏥 {clinic.clinic}</p>
             <p style={{ color: "#00c9a7", fontSize: 12, margin: 0 }}>📞 {clinic.phone} · {clinic.timings}</p>
@@ -446,67 +389,33 @@ export default function App() {
     return (
       <div style={s.app}>
         <div style={s.navbar}>
-          <div>
-            <div style={s.logo}>🩺 GastroDoc</div>
-            <div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div>
-          </div>
+          <div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div>
         </div>
         <div style={s.page}>
           <h2 style={s.title}>My Diagnosis 🏥</h2>
           <p style={s.subtitle}>Select your condition so we can personalise your health tips</p>
-
           {diagnosisList.map(d => (
-            <div
-              key={d}
-              onClick={() => setSelectedDiagnosis(d)}
-              style={{
-                background: selectedDiagnosis === d ? "#00c9a720" : "#132850",
-                border: selectedDiagnosis === d ? "2px solid #00c9a7" : "2px solid transparent",
-                borderRadius: 12,
-                padding: "13px 16px",
-                marginBottom: 9,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+            <div key={d} onClick={() => setSelectedDiagnosis(d)}
+              style={{ background: selectedDiagnosis === d ? "#00c9a720" : "#132850", border: selectedDiagnosis === d ? "2px solid #00c9a7" : "2px solid transparent", borderRadius: 12, padding: "13px 16px", marginBottom: 9, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ color: "#e8f4f8", fontSize: 14 }}>{d}</span>
               {selectedDiagnosis === d && <span style={{ color: "#00c9a7", fontSize: 18 }}>✓</span>}
             </div>
           ))}
-
-          {diagnosisSaved && (
-            <div style={{ ...s.success, textAlign: "center", marginBottom: 10 }}>
-              ✅ Diagnosis saved successfully!
-            </div>
-          )}
-
-          <button style={s.btn} onClick={handleSaveDiagnosis} disabled={diagnosisLoading || !selectedDiagnosis}>
-            {diagnosisLoading ? "Saving..." : "Save My Diagnosis"}
-          </button>
-          <button style={s.btnOutline} onClick={() => setShowDiagnosisScreen(false)}>
-            ← Back to Home
-          </button>
+          {diagnosisSaved && (<div style={{ ...s.success, textAlign: "center", marginBottom: 10 }}>✅ Diagnosis saved successfully!</div>)}
+          <button style={s.btn} onClick={handleSaveDiagnosis} disabled={diagnosisLoading || !selectedDiagnosis}>{diagnosisLoading ? "Saving..." : "Save My Diagnosis"}</button>
+          <button style={s.btnOutline} onClick={() => setShowDiagnosisScreen(false)}>← Back to Home</button>
         </div>
       </div>
     );
   }
 
-  // ── MAIN APP (logged in) ──
+  // ── MAIN APP ──
   return (
     <div style={s.app}>
       <div style={s.navbar}>
-        <div>
-          <div style={s.logo}>🩺 GastroDoc</div>
-          <div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div>
-        </div>
+        <div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          {navScreens.map(sc => (
-            <button key={sc.id} style={s.navBtn(screen === sc.id)} onClick={() => setScreen(sc.id)}>
-              {sc.icon}
-            </button>
-          ))}
+          {navScreens.map(sc => (<button key={sc.id} style={s.navBtn(screen === sc.id)} onClick={() => setScreen(sc.id)}>{sc.icon}</button>))}
         </div>
       </div>
 
@@ -516,27 +425,14 @@ export default function App() {
           <h2 style={s.title}>Welcome 👋</h2>
           <p style={s.subtitle}>Hello, {user.user_metadata?.full_name || user.email}!</p>
 
-          {/* ── DOCTOR PROFILE CARD — RECTANGULAR PHOTO ── */}
+          {/* DOCTOR CARD — RECTANGULAR PHOTO */}
           <div style={{ ...s.card, background: "linear-gradient(135deg,#0d2d50,#0a1f3a)", padding: 0, overflow: "hidden" }}>
-            {/* Full-width rectangular photo */}
-            <img
-              src="/dr-vivek.png.jpg"
-              alt="Dr. Vivek Shirol"
-              style={{
-                width: "100%",
-                height: 200,
-                objectFit: "cover",
-                objectPosition: "center top",
-                display: "block",
-              }}
-            />
-            {/* Doctor details below photo */}
+            <img src="/dr-vivek.png.jpg" alt="Dr. Vivek Shirol"
+              style={{ width: "100%", height: 200, objectFit: "cover", objectPosition: "center top", display: "block" }} />
             <div style={{ padding: "14px 16px 16px" }}>
               <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 17, margin: "0 0 3px" }}>👨‍⚕️ {clinic.doctor}</p>
               <p style={{ color: "#e8f4f8", fontSize: 12, margin: "0 0 8px" }}>{clinic.quals}</p>
-              <span style={{ background: "#00c9a720", color: "#00c9a7", fontSize: 10, padding: "3px 10px", borderRadius: 20, fontWeight: "bold", display: "inline-block", marginBottom: 10 }}>
-                🩺 Gastroenterologist
-              </span>
+              <span style={{ background: "#00c9a720", color: "#00c9a7", fontSize: 10, padding: "3px 10px", borderRadius: 20, fontWeight: "bold", display: "inline-block", marginBottom: 10 }}>🩺 Gastroenterologist</span>
               <div style={{ height: 1, background: "#1e3a5f", margin: "10px 0" }} />
               <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 3px" }}>🏥 {clinic.clinic}</p>
               <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 3px" }}>📍 {clinic.address}</p>
@@ -546,7 +442,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* ── DIAGNOSIS CARD ── */}
+          {/* DIAGNOSIS CARD */}
           <div style={{ ...s.card, borderLeft: "3px solid #a855f7", cursor: "pointer" }} onClick={() => setShowDiagnosisScreen(true)}>
             <p style={{ color: "#a855f7", fontSize: 11, fontWeight: "bold", marginBottom: 5 }}>🏥 MY DIAGNOSIS</p>
             {diagnosis ? (
@@ -559,15 +455,11 @@ export default function App() {
             )}
           </div>
 
-          {/* ── DAILY HEALTH TIP ── */}
+          {/* DAILY HEALTH TIP */}
           <div style={{ ...s.card, borderLeft: "3px solid #3b82f6" }}>
             <p style={{ color: "#3b82f6", fontSize: 11, fontWeight: "bold", marginBottom: 8 }}>💡 DAILY HEALTH TIP</p>
-            <p style={{ color: "#e8f4f8", fontSize: 14, lineHeight: 1.7, margin: "0 0 10px" }}>
-              {todaysTip.tip}
-            </p>
-            <p style={{ color: "#7fa8c9", fontSize: 10, lineHeight: 1.5, margin: 0, borderTop: "1px solid #1e3a5f", paddingTop: 8 }}>
-              📚 {todaysTip.ref}
-            </p>
+            <p style={{ color: "#e8f4f8", fontSize: 14, lineHeight: 1.7, margin: "0 0 10px" }}>{todaysTip.tip}</p>
+            <p style={{ color: "#7fa8c9", fontSize: 10, lineHeight: 1.5, margin: 0, borderTop: "1px solid #1e3a5f", paddingTop: 8 }}>📚 {todaysTip.ref}</p>
           </div>
 
           <button style={s.btn} onClick={() => setScreen("symptoms")}>📋 Check My Symptoms</button>
@@ -585,8 +477,7 @@ export default function App() {
           <h2 style={s.title}>Symptom Checker</h2>
           <p style={s.subtitle}>Select all symptoms you are experiencing today</p>
           <label style={s.label}>Your Name</label>
-          <input style={s.input} placeholder="Enter your full name"
-            value={patientName} onChange={e => setPatientName(e.target.value)} />
+          <input style={s.input} placeholder="Enter your full name" value={patientName} onChange={e => setPatientName(e.target.value)} />
           {symptomList.map(sym => (
             <div key={sym} style={s.symptomCard(symptoms.includes(sym))} onClick={() => toggleSymptom(sym)}>
               {symptoms.includes(sym) ? "☑" : "☐"} {sym}
@@ -603,8 +494,7 @@ export default function App() {
           <h2 style={s.title}>Bristol Stool Chart</h2>
           <p style={s.subtitle}>Tap your stool type to log it</p>
           {bristolTypes.map(b => (
-            <div key={b.type} style={s.bristolCard(bristolSelected?.type === b.type)}
-              onClick={() => { setBristolSelected(b); setBristolLogged(false); }}>
+            <div key={b.type} style={s.bristolCard(bristolSelected?.type === b.type)} onClick={() => { setBristolSelected(b); setBristolLogged(false); }}>
               <span style={{ fontSize: 26 }}>{b.emoji}</span>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
@@ -616,20 +506,11 @@ export default function App() {
               {bristolSelected?.type === b.type && <span style={{ color: "#00c9a7", fontSize: 18 }}>✓</span>}
             </div>
           ))}
-          {bristolSelected && (
-            <button style={s.btn} onClick={handleBristolLog}>
-              {bristolLogged ? "✅ Logged!" : "Log This Entry"}
-            </button>
-          )}
+          {bristolSelected && (<button style={s.btn} onClick={handleBristolLog}>{bristolLogged ? "✅ Logged!" : "Log This Entry"}</button>)}
           {bristolHistory.length > 0 && (
             <div style={{ marginTop: 20 }}>
               <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 10 }}>RECENT LOGS</p>
-              {bristolHistory.map((h, i) => (
-                <div key={i} style={s.card}>
-                  <p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 2px" }}>Type {h.type} — {h.tag}</p>
-                  <p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>{h.date} at {h.time}</p>
-                </div>
-              ))}
+              {bristolHistory.map((h, i) => (<div key={i} style={s.card}><p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 2px" }}>Type {h.type} — {h.tag}</p><p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>{h.date} at {h.time}</p></div>))}
             </div>
           )}
         </div>
@@ -642,25 +523,14 @@ export default function App() {
           <p style={s.subtitle}>🕐 {clinic.timings} · 🔴 {clinic.holiday}</p>
           {!appointmentDone ? (
             <>
-              <label style={s.label}>Full Name</label>
-              <input style={s.input} placeholder="Your full name"
-                value={apptName} onChange={e => setApptName(e.target.value)} />
-              <label style={s.label}>Phone Number</label>
-              <input style={s.input} placeholder="+91 XXXXX XXXXX"
-                value={apptPhone} onChange={e => setApptPhone(e.target.value)} />
-              <label style={s.label}>Preferred Date</label>
-              <input style={s.input} type="date"
-                value={apptDate} onChange={e => setApptDate(e.target.value)} />
+              <label style={s.label}>Full Name</label><input style={s.input} placeholder="Your full name" value={apptName} onChange={e => setApptName(e.target.value)} />
+              <label style={s.label}>Phone Number</label><input style={s.input} placeholder="+91 XXXXX XXXXX" value={apptPhone} onChange={e => setApptPhone(e.target.value)} />
+              <label style={s.label}>Preferred Date</label><input style={s.input} type="date" value={apptDate} onChange={e => setApptDate(e.target.value)} />
               <label style={s.label}>Visit Type</label>
               <select style={s.input} value={apptType} onChange={e => setApptType(e.target.value)}>
-                <option>First Consultation</option>
-                <option>Follow-up</option>
-                <option>Post-Procedure</option>
-                <option>Emergency</option>
+                <option>First Consultation</option><option>Follow-up</option><option>Post-Procedure</option><option>Emergency</option>
               </select>
-              <button style={s.btn} onClick={handleAppointment} disabled={loading}>
-                {loading ? "Saving..." : "Confirm Appointment Request"}
-              </button>
+              <button style={s.btn} onClick={handleAppointment} disabled={loading}>{loading ? "Saving..." : "Confirm Appointment Request"}</button>
             </>
           ) : (
             <div style={s.success}>
@@ -669,22 +539,13 @@ export default function App() {
               <p style={{ color: "#e8f4f8", fontSize: 14, margin: "0 0 3px" }}>👤 {apptName}</p>
               <p style={{ color: "#e8f4f8", fontSize: 14, margin: "0 0 3px" }}>📅 {apptDate} · {apptType}</p>
               <p style={{ color: "#7fa8c9", fontSize: 13, marginTop: 10 }}>{clinic.clinic} will confirm on {apptPhone} shortly.</p>
-              <button style={{ ...s.btn, marginTop: 14 }}
-                onClick={() => { setAppointmentDone(false); setApptName(""); setApptPhone(""); setApptDate(""); fetchAppointments(); }}>
-                Book Another
-              </button>
+              <button style={{ ...s.btn, marginTop: 14 }} onClick={() => { setAppointmentDone(false); setApptName(""); setApptPhone(""); setApptDate(""); fetchAppointments(); }}>Book Another</button>
             </div>
           )}
           {savedAppointments.length > 0 && (
             <div style={{ marginTop: 20 }}>
               <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 10 }}>RECENT BOOKINGS</p>
-              {savedAppointments.map((a, i) => (
-                <div key={i} style={s.card}>
-                  <p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 3px" }}>👤 {a.patient_name}</p>
-                  <p style={{ color: "#7fa8c9", fontSize: 12, margin: "0 0 2px" }}>📅 {a.date} · {a.visit_type}</p>
-                  <p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>📞 {a.phone}</p>
-                </div>
-              ))}
+              {savedAppointments.map((a, i) => (<div key={i} style={s.card}><p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 3px" }}>👤 {a.patient_name}</p><p style={{ color: "#7fa8c9", fontSize: 12, margin: "0 0 2px" }}>📅 {a.date} · {a.visit_type}</p><p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>📞 {a.phone}</p></div>))}
             </div>
           )}
         </div>
@@ -698,16 +559,11 @@ export default function App() {
           {videos.map((v, i) => (
             <div key={i} style={s.card}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <div style={{ width: 52, height: 52, borderRadius: 12, background: v.color + "25", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>
-                  {v.emoji}
-                </div>
+                <div style={{ width: 52, height: 52, borderRadius: 12, background: v.color + "25", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>{v.emoji}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 14, margin: "0 0 4px" }}>{v.title}</p>
                   <p style={{ color: "#7fa8c9", fontSize: 12, margin: "0 0 10px" }}>{v.platform}</p>
-                  <a href={v.link} target="_blank" rel="noreferrer"
-                    style={{ background: v.color, color: "#fff", padding: "6px 16px", borderRadius: 20, fontSize: 12, fontWeight: "bold", textDecoration: "none", display: "inline-block" }}>
-                    {v.platform === "YouTube" ? "▶ Watch" : "📱 Follow"}
-                  </a>
+                  <a href={v.link} target="_blank" rel="noreferrer" style={{ background: v.color, color: "#fff", padding: "6px 16px", borderRadius: 20, fontSize: 12, fontWeight: "bold", textDecoration: "none", display: "inline-block" }}>{v.platform === "YouTube" ? "▶ Watch" : "📱 Follow"}</a>
                 </div>
               </div>
             </div>
@@ -727,23 +583,14 @@ export default function App() {
             <p style={{ color: "#00c9a7", fontSize: 13, margin: "0 0 3px", fontWeight: "bold" }}>🕐 {clinic.timings}</p>
             <p style={{ color: "#ef4444", fontSize: 12, margin: 0 }}>🔴 {clinic.holiday}</p>
           </div>
-          <a href={"https://wa.me/91" + clinic.phone.replace(/\D/g, "")} target="_blank" rel="noreferrer"
-            style={{ display: "block", background: "#25D366", color: "#fff", textAlign: "center", padding: 14, borderRadius: 12, fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 10 }}>
-            💬 WhatsApp Us
-          </a>
-          <a href={"tel:" + clinic.phone}
-            style={{ display: "block", background: "#1e3a5f", color: "#00c9a7", textAlign: "center", padding: 13, borderRadius: 12, fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 16 }}>
-            📞 Call Clinic
-          </a>
+          <a href={"https://wa.me/91" + clinic.phone.replace(/\D/g, "")} target="_blank" rel="noreferrer" style={{ display: "block", background: "#25D366", color: "#fff", textAlign: "center", padding: 14, borderRadius: 12, fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 10 }}>💬 WhatsApp Us</a>
+          <a href={"tel:" + clinic.phone} style={{ display: "block", background: "#1e3a5f", color: "#00c9a7", textAlign: "center", padding: 13, borderRadius: 12, fontWeight: "bold", fontSize: 15, textDecoration: "none", marginBottom: 16 }}>📞 Call Clinic</a>
           {!msgSent ? (
             <>
-              <label style={s.label}>Your Name</label>
-              <input style={s.input} placeholder="Your full name" value={msgName} onChange={e => setMsgName(e.target.value)} />
-              <label style={s.label}>Phone Number</label>
-              <input style={s.input} placeholder="+91 XXXXX XXXXX" value={msgPhone} onChange={e => setMsgPhone(e.target.value)} />
+              <label style={s.label}>Your Name</label><input style={s.input} placeholder="Your full name" value={msgName} onChange={e => setMsgName(e.target.value)} />
+              <label style={s.label}>Phone Number</label><input style={s.input} placeholder="+91 XXXXX XXXXX" value={msgPhone} onChange={e => setMsgPhone(e.target.value)} />
               <label style={s.label}>Your Query / Message</label>
-              <textarea style={{ ...s.input, height: 100, resize: "none" }} placeholder="Type your question..."
-                value={msgText} onChange={e => setMsgText(e.target.value)} />
+              <textarea style={{ ...s.input, height: 100, resize: "none" }} placeholder="Type your question..." value={msgText} onChange={e => setMsgText(e.target.value)} />
               <button style={s.btn} onClick={handleMessage}>Send Message</button>
             </>
           ) : (
@@ -761,8 +608,7 @@ export default function App() {
       <div style={s.bottomNav}>
         {navScreens.map(n => (
           <button key={n.id} style={s.bottomBtn(screen === n.id)} onClick={() => setScreen(n.id)}>
-            <span style={{ fontSize: 16 }}>{n.icon}</span>
-            {n.label}
+            <span style={{ fontSize: 16 }}>{n.icon}</span>{n.label}
           </button>
         ))}
       </div>
