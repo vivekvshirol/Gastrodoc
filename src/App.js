@@ -220,7 +220,6 @@ export default function App() {
   const todaysTip = allHealthTips[dayOfYear % allHealthTips.length];
   const symptomList = ["Abdominal Pain", "Bloating", "Nausea", "Diarrhea", "Constipation", "Heartburn / Acidity"];
 
-  // ── fetchDiagnosis defined with useCallback BEFORE useEffect ──
   const fetchDiagnosis = useCallback(async (currentUser) => {
     const { data } = await supabase
       .from("patient_profiles")
@@ -250,18 +249,14 @@ export default function App() {
   }, [screen, user]);
 
   const fetchAppointments = async () => {
-    const { data } = await supabase
-      .from("appointments")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const { data } = await supabase.from("appointments").select("*").order("created_at", { ascending: false });
     if (data) setSavedAppointments(data);
   };
 
   const handleSaveDiagnosis = async () => {
     if (!selectedDiagnosis) return;
     setDiagnosisLoading(true);
-    const { error } = await supabase
-      .from("patient_profiles")
+    const { error } = await supabase.from("patient_profiles")
       .upsert({ user_id: user.id, diagnosis: selectedDiagnosis, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
     setDiagnosisLoading(false);
     if (!error) {
@@ -272,20 +267,14 @@ export default function App() {
   };
 
   const handleGoogleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: "https://gastrodoc.vercel.app" },
-    });
+    await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: "https://gastrodoc.vercel.app" } });
   };
 
   const handleSignUp = async () => {
     if (!authEmail || !authPassword || !authName) { setAuthError("Please fill in all fields."); return; }
     if (authPassword.length < 6) { setAuthError("Password must be at least 6 characters."); return; }
     setAuthLoading(true); setAuthError("");
-    const { error } = await supabase.auth.signUp({
-      email: authEmail, password: authPassword,
-      options: { data: { full_name: authName } }
-    });
+    const { error } = await supabase.auth.signUp({ email: authEmail, password: authPassword, options: { data: { full_name: authName } } });
     setAuthLoading(false);
     if (error) setAuthError(error.message);
     else setAuthError("✅ Account created! Please check your email to verify, then log in.");
@@ -304,9 +293,7 @@ export default function App() {
     setUser(null); setScreen("home"); setDiagnosis(""); setSelectedDiagnosis("");
   };
 
-  const toggleSymptom = (s) => {
-    setSymptoms(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
-  };
+  const toggleSymptom = (s) => setSymptoms(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
 
   const handleSubmit = () => {
     if (!patientName) { setSubmitResult("⚠️ Please enter your name first."); return; }
@@ -425,20 +412,38 @@ export default function App() {
           <h2 style={s.title}>Welcome 👋</h2>
           <p style={s.subtitle}>Hello, {user.user_metadata?.full_name || user.email}!</p>
 
-          {/* DOCTOR CARD — RECTANGULAR PHOTO */}
-          <div style={{ ...s.card, background: "linear-gradient(135deg,#0d2d50,#0a1f3a)", padding: 0, overflow: "hidden" }}>
-            <img src="/dr-vivek.png.jpg" alt="Dr. Vivek Shirol"
-              style={{ width: "100%", height: 200, objectFit: "cover", objectPosition: "center top", display: "block" }} />
-            <div style={{ padding: "14px 16px 16px" }}>
-              <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 17, margin: "0 0 3px" }}>👨‍⚕️ {clinic.doctor}</p>
-              <p style={{ color: "#e8f4f8", fontSize: 12, margin: "0 0 8px" }}>{clinic.quals}</p>
-              <span style={{ background: "#00c9a720", color: "#00c9a7", fontSize: 10, padding: "3px 10px", borderRadius: 20, fontWeight: "bold", display: "inline-block", marginBottom: 10 }}>🩺 Gastroenterologist</span>
-              <div style={{ height: 1, background: "#1e3a5f", margin: "10px 0" }} />
-              <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 3px" }}>🏥 {clinic.clinic}</p>
-              <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 3px" }}>📍 {clinic.address}</p>
-              <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 3px" }}>📞 {clinic.phone}</p>
-              <p style={{ color: "#00c9a7", fontSize: 13, margin: "4px 0 2px", fontWeight: "bold" }}>🕐 {clinic.timings}</p>
-              <p style={{ color: "#ef4444", fontSize: 12, margin: 0 }}>🔴 {clinic.holiday}</p>
+          {/* ── DOCTOR CARD: small rectangle photo + details side by side ── */}
+          <div style={{ ...s.card, background: "linear-gradient(135deg,#0d2d50,#0a1f3a)" }}>
+            <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+              {/* ── RECTANGULAR PHOTO with teal border ── */}
+              <img
+                src="/dr-vivek.png.jpg"
+                alt="Dr. Vivek Shirol"
+                style={{
+                  width: 100,
+                  height: 130,
+                  objectFit: "cover",
+                  objectFit: "contain",
+                  objectPosition: "center",
+                  borderRadius: 10,
+                  border: "3px solid #00c9a7",
+                  boxShadow: "0 0 12px #00c9a740",
+                  flexShrink: 0,
+                  background: "#0a1628",
+                }}
+              />
+              {/* ── Doctor details ── */}
+              <div style={{ flex: 1 }}>
+                <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 15, margin: "0 0 3px" }}>👨‍⚕️ {clinic.doctor}</p>
+                <p style={{ color: "#e8f4f8", fontSize: 11, margin: "0 0 6px", lineHeight: 1.4 }}>{clinic.quals}</p>
+                <span style={{ background: "#00c9a720", color: "#00c9a7", fontSize: 10, padding: "2px 8px", borderRadius: 20, fontWeight: "bold", display: "inline-block", marginBottom: 8 }}>🩺 Gastroenterologist</span>
+                <div style={{ height: 1, background: "#1e3a5f", margin: "8px 0" }} />
+                <p style={{ color: "#7fa8c9", fontSize: 11, margin: "0 0 2px" }}>🏥 {clinic.clinic}</p>
+                <p style={{ color: "#7fa8c9", fontSize: 11, margin: "0 0 2px" }}>📍 {clinic.address}</p>
+                <p style={{ color: "#7fa8c9", fontSize: 11, margin: "0 0 2px" }}>📞 {clinic.phone}</p>
+                <p style={{ color: "#00c9a7", fontSize: 11, margin: "3px 0 1px", fontWeight: "bold" }}>🕐 {clinic.timings}</p>
+                <p style={{ color: "#ef4444", fontSize: 10, margin: 0 }}>🔴 {clinic.holiday}</p>
+              </div>
             </div>
           </div>
 
