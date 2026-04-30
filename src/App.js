@@ -412,19 +412,19 @@ export default function App() {
           <h2 style={s.title}>Welcome 👋</h2>
           <p style={s.subtitle}>Hello, {user.user_metadata?.full_name || user.email}!</p>
 
-          {/* ── DOCTOR CARD: small rectangle photo + details side by side ── */}
+          {/* DOCTOR CARD */}
           <div style={{ ...s.card, background: "linear-gradient(135deg,#0d2d50,#0a1f3a)" }}>
             <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-              {/* ── RECTANGULAR PHOTO with teal border ── */}
+
+              {/* ── FIXED: Rectangle photo, full image visible, teal border, no duplicate objectFit ── */}
               <img
                 src="/dr-vivek.png.jpg"
                 alt="Dr. Vivek Shirol"
                 style={{
                   width: 100,
                   height: 130,
-                  objectFit: "cover",
                   objectFit: "contain",
-                  objectPosition: "center",
+                  objectPosition: "center top",
                   borderRadius: 10,
                   border: "3px solid #00c9a7",
                   boxShadow: "0 0 12px #00c9a740",
@@ -432,7 +432,8 @@ export default function App() {
                   background: "#0a1628",
                 }}
               />
-              {/* ── Doctor details ── */}
+
+              {/* Doctor details */}
               <div style={{ flex: 1 }}>
                 <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 15, margin: "0 0 3px" }}>👨‍⚕️ {clinic.doctor}</p>
                 <p style={{ color: "#e8f4f8", fontSize: 11, margin: "0 0 6px", lineHeight: 1.4 }}>{clinic.quals}</p>
