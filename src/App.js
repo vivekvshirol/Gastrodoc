@@ -225,7 +225,6 @@ export default function App() {
             </p>
           </div>
 
-          {/* ── GOOGLE LOGIN BUTTON ── */}
           <button style={s.btnGoogle} onClick={handleGoogleLogin}>
             <svg width="20" height="20" viewBox="0 0 48 48">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -236,7 +235,6 @@ export default function App() {
             Continue with Google
           </button>
 
-          {/* ── DIVIDER ── */}
           <div style={s.divider}>
             <div style={s.dividerLine}></div>
             <span style={s.dividerText}>or use email</span>
@@ -305,14 +303,52 @@ export default function App() {
           <h2 style={s.title}>Welcome 👋</h2>
           <p style={s.subtitle}>Hello, {user.user_metadata?.full_name || user.email}!</p>
 
-          <div style={{ ...s.card, background: "linear-gradient(135deg,#0d2d50,#0a1f3a)" }}>
-            <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 16, margin: "0 0 4px" }}>👨‍⚕️ {clinic.doctor}</p>
-            <p style={{ color: "#e8f4f8", fontSize: 13, margin: "0 0 2px" }}>{clinic.quals}</p>
-            <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 2px" }}>🏥 {clinic.clinic}</p>
-            <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 2px" }}>📍 {clinic.address}</p>
-            <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 2px" }}>📞 {clinic.phone}</p>
-            <p style={{ color: "#00c9a7", fontSize: 13, margin: "6px 0 0", fontWeight: "bold" }}>🕐 {clinic.timings}</p>
-            <p style={{ color: "#ef4444", fontSize: 12, margin: "2px 0 0" }}>🔴 {clinic.holiday}</p>
+          {/* ── DOCTOR PROFILE CARD WITH PHOTO ── */}
+          <div style={{ ...s.card, background: "linear-gradient(135deg,#0d2d50,#0a1f3a)", padding: 0, overflow: "hidden" }}>
+
+            {/* Top section: photo + name + quals */}
+            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 16px 12px" }}>
+              {/* Circular photo */}
+              <div style={{ flexShrink: 0 }}>
+                <img
+                  src="/dr-vivek.png.jpg"
+                  alt="Dr. Vivek Shirol"
+                  style={{
+                    width: 90,
+                    height: 90,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    objectPosition: "top",
+                    border: "3px solid #00c9a7",
+                    boxShadow: "0 0 16px #00c9a740",
+                  }}
+                />
+              </div>
+              {/* Name + quals */}
+              <div style={{ flex: 1 }}>
+                <p style={{ color: "#00c9a7", fontWeight: "bold", fontSize: 17, margin: "0 0 4px" }}>
+                  Dr. Vivek Shirol
+                </p>
+                <p style={{ color: "#e8f4f8", fontSize: 12, margin: "0 0 4px", lineHeight: 1.4 }}>
+                  {clinic.quals}
+                </p>
+                <span style={{ background: "#00c9a720", color: "#00c9a7", fontSize: 10, padding: "3px 10px", borderRadius: 20, fontWeight: "bold", display: "inline-block" }}>
+                  🩺 Gastroenterologist
+                </span>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div style={{ height: 1, background: "#1e3a5f", margin: "0 16px" }} />
+
+            {/* Clinic details below */}
+            <div style={{ padding: "12px 16px 16px" }}>
+              <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 4px" }}>🏥 {clinic.clinic}</p>
+              <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 4px" }}>📍 {clinic.address}</p>
+              <p style={{ color: "#7fa8c9", fontSize: 13, margin: "0 0 4px" }}>📞 {clinic.phone}</p>
+              <p style={{ color: "#00c9a7", fontSize: 13, margin: "4px 0 2px", fontWeight: "bold" }}>🕐 {clinic.timings}</p>
+              <p style={{ color: "#ef4444", fontSize: 12, margin: 0 }}>🔴 {clinic.holiday}</p>
+            </div>
           </div>
 
           <div style={{ ...s.card, borderLeft: "3px solid #3b82f6" }}>
@@ -519,4 +555,3 @@ export default function App() {
     </div>
   );
 }
-
