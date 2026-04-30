@@ -10,11 +10,9 @@ const supabase = createClient(
 // --- CLINIC & CONTENT DATA ---
 const clinic = {
   doctor: "Dr. Vivek Shirol",
-  photo: "https://lh3.googleusercontent.com/d/1X-uWf_Y_M4z_o9N9k6O6_z4Y7W2o4W5G", // Hosted link for your uploaded photo
+  photo: "/dr-vivek.png", // Matches the filename you just created
   quals: "MBBS, MD, DM Gastroenterology, SGPGI",
-  clinic: "Dr. Vivek's Complete Gastro Care Clinic",
   address: "Belagavi, Karnataka",
-  phone: "7760933XXX",
   timings: "Mon–Sat: 5:00 PM – 9:00 PM",
 };
 
@@ -25,11 +23,11 @@ const healthTips = [
 ];
 
 const diagnosisTips = {
-  "GERD": "Avoid lying down for 3 hours after dinner to prevent acid reflux tonight.",
-  "IBS": "Track your triggers this week; stress management is as vital as diet.",
-  "Fatty Liver": "Avoid sugary drinks and aim for 30 mins of brisk walking today.",
-  "Constipation": "Focus on high-fiber foods like oats and legumes this week.",
-  "IBD": "Ensure you are taking your maintenance meds even if you feel fine today."
+  "GERD": "Avoid lying down for 3 hours after dinner to prevent acid reflux tonight. (Source: AGA)",
+  "IBS": "Track your triggers this week; stress management is as vital as diet. (Source: Stanford)",
+  "Fatty Liver": "Avoid sugary drinks and aim for 30 mins of brisk walking today. (Source: AASLD)",
+  "Constipation": "Focus on high-fiber foods like oats and legumes this week. (Source: ACG)",
+  "IBD": "Ensure you are taking your maintenance meds even if you feel fine today. (Source: ECCO)"
 };
 
 const bristolTypes = [
@@ -44,22 +42,21 @@ const s = {
   navbar: { background: "#0f2040", borderBottom: "2px solid #00c9a7", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" },
   logo: { color: "#00c9a7", fontWeight: "bold", fontSize: 16 },
   page: { padding: "20px 16px" },
-  title: { color: "#00c9a7", fontSize: 20, marginBottom: 4 },
+  title: { color: "#00c9a7", fontSize: 20, marginBottom: 15 },
   card: { background: "#132850", border: "1px solid #1e3a5f", borderRadius: 14, padding: 16, marginBottom: 12 },
-  profileImg: { width: 85, height: 85, borderRadius: "50%", border: "2px solid #00c9a7", objectFit: "cover", marginRight: 15 },
+  profileImg: { width: 90, height: 90, borderRadius: "50%", border: "2px solid #00c9a7", objectFit: "cover", marginRight: 15 },
   tipCard: { background: "#132850", borderLeft: "4px solid #3b82f6", borderRadius: 14, padding: 16, marginBottom: 20 },
-  diagCard: { background: "#00c9a715", border: "1px dashed #00c9a7", borderRadius: 14, padding: 16, marginBottom: 20 },
   input: { width: "100%", padding: 12, borderRadius: 10, border: "1px solid #1e3a5f", background: "#0f2040", color: "#e8f4f8", fontSize: 15, marginBottom: 14, boxSizing: "border-box" },
   btn: { width: "100%", background: "#00c9a7", color: "#0a1628", border: "none", padding: 14, borderRadius: 12, fontSize: 15, fontWeight: "bold", cursor: "pointer", marginTop: 6 },
   bottomNav: { position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 500, background: "#0f2040", borderTop: "1px solid #1e3a5f", display: "flex", justifyContent: "space-around", padding: "10px 0" },
+  bristolImg: { width: 60, height: 40, objectFit: "contain", background: "#fff", borderRadius: 4, padding: 2 }
 };
 
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [user, setUser] = useState(null);
   const [diagnosis, setDiagnosis] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
-
+  
   const dailyTip = healthTips[new Date().getDate() % healthTips.length];
 
   useEffect(() => {
@@ -72,20 +69,16 @@ export default function App() {
   }, []);
 
   const updateDiagnosis = async (value) => {
-    setIsUpdating(true);
-    const { data, error } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       data: { diagnosis: value }
     });
-    if (!error) {
-      setDiagnosis(value);
-      alert("Diagnosis updated permanently.");
-    }
-    setIsUpdating(false);
+    if (!error) setDiagnosis(value);
   };
 
   if (!user) {
     return (
       <div style={s.app}>
+        <div style={s.navbar}><div style={s.logo}>🩺 GastroDoc</div></div>
         <div style={s.page}>
           <button style={s.btn} onClick={() => supabase.auth.signInWithOAuth({ provider: "google" })}>Login with Google</button>
         </div>
@@ -97,30 +90,25 @@ export default function App() {
     <div style={s.app}>
       <div style={s.navbar}>
         <div style={s.logo}>🩺 GastroDoc</div>
-        <div style={{ color: "#00c9a7", fontSize: 12 }}>{user.user_metadata?.full_name}</div>
+        <div style={{ color: "#00c9a7", fontSize: 12 }}>Hi, {user.user_metadata?.full_name?.split(' ')[0]}</div>
       </div>
 
       {screen === "home" && (
         <div style={s.page}>
           {/* DR PROFILE SECTION */}
           <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
-            <img src={clinic.photo} alt="Dr. Vivek Shirol" style={s.profileImg} />
+            <img src={clinic.photo} alt={clinic.doctor} style={s.profileImg} />
             <div>
               <p style={{ color: "#00c9a7", fontWeight: "bold", margin: 0, fontSize: 18 }}>{clinic.doctor}</p>
               <p style={{ color: "#7fa8c9", fontSize: 11, margin: "4px 0" }}>{clinic.quals}</p>
-              <p style={{ color: "#e8f4f8", fontSize: 12 }}>📍 Belagavi, Karnataka</p>
+              <p style={{ color: "#e8f4f8", fontSize: 12 }}>📍 {clinic.address}</p>
             </div>
           </div>
 
           {/* DIAGNOSIS SECTION */}
           <div style={s.card}>
-            <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 8 }}>MY CLINICAL DIAGNOSIS</p>
-            <select 
-              style={s.input} 
-              value={diagnosis} 
-              onChange={(e) => updateDiagnosis(e.target.value)}
-              disabled={isUpdating}
-            >
+            <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 8 }}>MY DIAGNOSIS</p>
+            <select style={s.input} value={diagnosis} onChange={(e) => updateDiagnosis(e.target.value)}>
               <option value="">Select Diagnosis...</option>
               <option value="GERD">GERD (Acid Reflux)</option>
               <option value="IBS">IBS (Irritable Bowel)</option>
@@ -129,25 +117,38 @@ export default function App() {
               <option value="IBD">IBD (Crohn's/Colitis)</option>
             </select>
             {diagnosis && (
-              <div style={{ background: "#00c9a720", padding: 10, borderRadius: 8, fontSize: 13 }}>
-                <span style={{ color: "#00c9a7", fontWeight: "bold" }}>Weekly Focus: </span>
-                {diagnosisTips[diagnosis]}
+              <div style={{ background: "#00c9a715", borderLeft: '3px solid #00c9a7', padding: 12, borderRadius: 8 }}>
+                <p style={{ color: "#00c9a7", fontSize: 11, fontWeight: "bold", margin: "0 0 5px" }}>WEEKLY CARE TIP</p>
+                <p style={{ fontSize: 13, margin: 0 }}>{diagnosisTips[diagnosis]}</p>
               </div>
             )}
           </div>
 
-          {/* HEALTH TIP SECTION */}
           <div style={s.tipCard}>
-            <p style={{ color: "#3b82f6", fontSize: 11, fontWeight: "bold", marginBottom: 6 }}>💡 DAILY GENERAL TIP</p>
+            <p style={{ color: "#3b82f6", fontSize: 11, fontWeight: "bold", marginBottom: 6 }}>💡 DAILY HEALTH TIP</p>
             <p style={{ color: "#e8f4f8", fontSize: 14 }}>{dailyTip.text}</p>
             <p style={{ color: "#7fa8c9", fontSize: 10, marginTop: 5 }}>{dailyTip.ref}</p>
           </div>
-
-          <button style={s.btn} onClick={() => setScreen("appointments")}>📅 Book Appointment</button>
         </div>
       )}
 
-      {/* FOOTER NAV */}
+      {screen === "bristol" && (
+        <div style={s.page}>
+          <h2 style={s.title}>Bristol Stool Tracker</h2>
+          {bristolTypes.map(b => (
+            <div key={b.type} style={s.card}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
+                <img src={b.img} style={s.bristolImg} alt="Bristol Type" />
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: 14 }}>Type {b.type}</div>
+                  <div style={{ fontSize: 11, color: '#7fa8c9' }}>{b.desc}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div style={s.bottomNav}>
         <button style={{ background: "none", border: "none", color: screen === "home" ? "#00c9a7" : "#7fa8c9" }} onClick={() => setScreen("home")}>🏠<br/>Home</button>
         <button style={{ background: "none", border: "none", color: screen === "bristol" ? "#00c9a7" : "#7fa8c9" }} onClick={() => setScreen("bristol")}>💧<br/>Bristol</button>
