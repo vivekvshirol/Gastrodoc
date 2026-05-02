@@ -19,7 +19,6 @@ const clinic = {
   mapsLink: "https://maps.app.goo.gl/eQvb8QB8ANJPX2pU7",
 };
 
-// ── Diet charts: diagnosis key → PDF filename in Supabase ──
 const dietCharts = [
   { label: "GERD & Dyspepsia", file: "GERD Dyspepsia diet chart.pdf", diagnosis: "GERD / Acid Reflux", emoji: "🔥", color: "#ef4444" },
   { label: "IBS Diet Chart", file: "IBS Diet chart.pdf", diagnosis: "IBS (Irritable Bowel Syndrome)", emoji: "🌀", color: "#f59e0b" },
@@ -29,7 +28,6 @@ const dietCharts = [
   { label: "Constipation Diet Chart", file: "Constipation diet chart.pdf", diagnosis: "Chronic Constipation", emoji: "🌾", color: "#10b981" },
 ];
 
-// ── Pre-procedure videos ──
 const procedureVideos = [
   { title: "Colonoscopy Preparation", desc: "How to prepare for your colonoscopy procedure", link: "https://youtu.be/OkmdJVTRE78?si=4G2z80DLDz6JleiQ", emoji: "🔭", color: "#3b82f6" },
   { title: "UGIE (Upper GI Endoscopy) Preparation", desc: "How to prepare for your upper GI endoscopy", link: "https://youtu.be/vItktDQo-mE?si=KWjEZAH2HClcY-kU", emoji: "🩺", color: "#8b5cf6" },
@@ -41,14 +39,15 @@ const videos = [
   { title: "Follow on Instagram", platform: "Instagram", link: "https://www.instagram.com/vivekshirol_234?igsh=MTloNzNxZ2xsbHp3NA==", emoji: "📱", color: "#e91e63" },
 ];
 
+// ── Bristol types with image paths ──
 const bristolTypes = [
-  { type: 1, emoji: "🟤", desc: "Separate hard lumps", tag: "Constipation", color: "#ef4444" },
-  { type: 2, emoji: "🟤", desc: "Lumpy sausage shape", tag: "Constipation", color: "#ef4444" },
-  { type: 3, emoji: "🟫", desc: "Sausage with cracks", tag: "Normal", color: "#00c9a7" },
-  { type: 4, emoji: "🟢", desc: "Smooth soft sausage", tag: "Normal", color: "#00c9a7" },
-  { type: 5, emoji: "🟡", desc: "Soft blobs, clear edges", tag: "Lacking Fiber", color: "#f59e0b" },
-  { type: 6, emoji: "🟠", desc: "Fluffy, mushy pieces", tag: "Mild Diarrhea", color: "#f97316" },
-  { type: 7, emoji: "🔴", desc: "Entirely liquid", tag: "Diarrhea", color: "#ef4444" },
+  { type: 1, img: "/bristol1.jpg.jpg", desc: "Separate hard lumps, like little pebbles", tag: "Constipation", color: "#ef4444" },
+  { type: 2, img: "/bristol2.jpg.jpg", desc: "Hard and lumpy, sausage-shaped", tag: "Constipation", color: "#ef4444" },
+  { type: 3, img: "/bristol3.jpg.jpg", desc: "Sausage-shaped with cracks on surface", tag: "Normal", color: "#00c9a7" },
+  { type: 4, img: "/bristol4.jpg.jpg", desc: "Smooth, soft sausage or snake", tag: "Normal", color: "#00c9a7" },
+  { type: 5, img: "/bristol5.jpg.jpg", desc: "Soft blobs with clear-cut edges", tag: "Lacking Fiber", color: "#f59e0b" },
+  { type: 6, img: "/bristol6.jpg.jpg", desc: "Fluffy, mushy pieces with ragged edges", tag: "Mild Diarrhea", color: "#f97316" },
+  { type: 7, img: "/bristol7.jpg.jpg", desc: "Watery with no solid pieces", tag: "Diarrhea", color: "#ef4444" },
 ];
 
 const symptomList = [
@@ -57,7 +56,6 @@ const symptomList = [
   "Early Satiety", "Regurgitation", "Weight Loss", "Blood in Stool",
 ];
 
-// ── Updated diagnosis list with CLD ──
 const diagnosisList = [
   "GERD / Acid Reflux", "IBS (Irritable Bowel Syndrome)", "IBD / Crohn's Disease",
   "IBD / Ulcerative Colitis", "NAFLD / Fatty Liver", "CLD / Liver Cirrhosis",
@@ -177,18 +175,51 @@ const allHealthTips = [
   { tip: "🩺 Do not ignore persistent gut symptoms — blood in stool, unexplained weight loss, pain that wakes you at night, or worsening symptoms. These always need proper medical evaluation. Early diagnosis saves lives.", ref: "ASGE Patient Education — Diet and GERD (2014); Hashash JG et al. — AGA (2024)" },
 ];
 
+// ── Watermark background style applied to every page wrapper ──
+const bgStyle = {
+  position: "relative",
+  minHeight: "100vh",
+};
+
+const watermarkStyle = {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "80%",
+  maxWidth: 380,
+  opacity: 0.06,
+  pointerEvents: "none",
+  zIndex: 0,
+  userSelect: "none",
+};
+
+const contentStyle = {
+  position: "relative",
+  zIndex: 1,
+};
+
+// ── Watermark component used on every screen ──
+const Watermark = () => (
+  <img
+    src="/clinic-logo.png.jpg"
+    alt=""
+    style={watermarkStyle}
+    aria-hidden="true"
+  />
+);
+
 const s = {
-  app: { background: "#0a1628", minHeight: "100vh", color: "#e8f4f8", fontFamily: "Arial, sans-serif", maxWidth: 500, margin: "0 auto", padding: "0 0 80px" },
-  navbar: { background: "#0f2040", borderBottom: "2px solid #00c9a7", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" },
+  app: { background: "#0a1628", minHeight: "100vh", color: "#e8f4f8", fontFamily: "Arial, sans-serif", maxWidth: 500, margin: "0 auto", padding: "0 0 80px", position: "relative" },
+  navbar: { background: "#0f2040", borderBottom: "2px solid #00c9a7", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", zIndex: 10 },
   logo: { color: "#00c9a7", fontWeight: "bold", fontSize: 16 },
   navBtn: (active) => ({ background: active ? "#00c9a720" : "none", border: "none", color: active ? "#00c9a7" : "#7fa8c9", cursor: "pointer", fontSize: 11, padding: "5px 7px", borderRadius: 8 }),
-  page: { padding: "20px 16px" },
+  page: { padding: "20px 16px", position: "relative", zIndex: 1 },
   title: { color: "#00c9a7", fontSize: 20, marginBottom: 4 },
   subtitle: { color: "#7fa8c9", fontSize: 13, marginBottom: 20 },
   card: { background: "#132850", border: "1px solid #1e3a5f", borderRadius: 14, padding: 16, marginBottom: 12 },
   input: { width: "100%", padding: 12, borderRadius: 10, border: "1px solid #1e3a5f", background: "#0f2040", color: "#e8f4f8", fontSize: 15, marginBottom: 14, boxSizing: "border-box", display: "block" },
   label: { color: "#7fa8c9", fontSize: 11, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 },
-  bristolCard: (sel) => ({ background: sel ? "#00c9a720" : "#132850", border: sel ? "2px solid #00c9a7" : "2px solid transparent", borderRadius: 14, padding: "13px 14px", marginBottom: 9, cursor: "pointer", display: "flex", alignItems: "center", gap: 12 }),
   btn: { width: "100%", background: "#00c9a7", color: "#0a1628", border: "none", padding: 14, borderRadius: 12, fontSize: 15, fontWeight: "bold", cursor: "pointer", marginTop: 6 },
   btnOutline: { width: "100%", background: "#1e3a5f", color: "#00c9a7", border: "none", padding: 13, borderRadius: 12, fontSize: 15, fontWeight: "bold", cursor: "pointer", marginTop: 8 },
   btnBack: { width: "100%", background: "#0f2040", color: "#7fa8c9", border: "1px solid #1e3a5f", padding: 13, borderRadius: 12, fontSize: 14, fontWeight: "bold", cursor: "pointer", marginTop: 16 },
@@ -200,7 +231,7 @@ const s = {
   divider: { display: "flex", alignItems: "center", gap: 10, margin: "16px 0" },
   dividerLine: { flex: 1, height: 1, background: "#1e3a5f" },
   dividerText: { color: "#7fa8c9", fontSize: 12 },
-  bottomNav: { position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 500, background: "#0f2040", borderTop: "1px solid #1e3a5f", display: "flex", justifyContent: "space-around", padding: "8px 0" },
+  bottomNav: { position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 500, background: "#0f2040", borderTop: "1px solid #1e3a5f", display: "flex", justifyContent: "space-around", padding: "8px 0", zIndex: 10 },
   bottomBtn: (active) => ({ background: "none", border: "none", cursor: "pointer", color: active ? "#00c9a7" : "#7fa8c9", fontSize: 9, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "3px 5px" }),
 };
 
@@ -217,7 +248,6 @@ export default function App() {
   const [authName, setAuthName] = useState("");
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
-  const [symptomLogs, setSymptomLogs] = useState([]);
   const [bristolSelected, setBristolSelected] = useState(null);
   const [bristolLogged, setBristolLogged] = useState(false);
   const [bristolHistory, setBristolHistory] = useState([]);
@@ -233,9 +263,7 @@ export default function App() {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [referralCopied, setReferralCopied] = useState(false);
-
-  // ── Appointment with symptoms flow (3 steps) ──
-  const [apptStep, setApptStep] = useState(1); // 1=symptoms, 2=details, 3=done
+  const [apptStep, setApptStep] = useState(1);
   const [apptSymptoms, setApptSymptoms] = useState([]);
   const [apptExtraSymptom, setApptExtraSymptom] = useState("");
   const [apptName, setApptName] = useState("");
@@ -257,8 +285,7 @@ export default function App() {
   }, []);
 
   const fetchSymptomLogs = useCallback(async (currentUser) => {
-    const { data } = await supabase.from("symptom_logs").select("*").eq("user_id", currentUser.id).order("logged_at", { ascending: false }).limit(20);
-    if (data) setSymptomLogs(data);
+    await supabase.from("symptom_logs").select("*").eq("user_id", currentUser.id).order("logged_at", { ascending: false }).limit(20);
   }, []);
 
   useEffect(() => {
@@ -309,23 +336,17 @@ export default function App() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null); setScreen("home"); setDiagnosis(""); setSelectedDiagnosis(""); setBristolHistory([]); setSymptomLogs([]);
+    setUser(null); setScreen("home"); setDiagnosis(""); setSelectedDiagnosis(""); setBristolHistory([]);
   };
 
   const toggleApptSymptom = (sym) => setApptSymptoms(prev => prev.includes(sym) ? prev.filter(x => x !== sym) : [...prev, sym]);
 
-  // ── Appointment with symptoms — final submit ──
   const handleAppointment = async () => {
     if (!apptName || !apptPhone || !apptDate) { alert("Please fill in all fields."); return; }
     setLoading(true);
     const allSymptoms = apptExtraSymptom ? [...apptSymptoms, apptExtraSymptom] : apptSymptoms;
-    // Save appointment
     const { error } = await supabase.from("appointments").insert([{ patient_name: apptName, phone: apptPhone, date: apptDate, visit_type: apptType }]);
-    // Save symptom log linked to appointment
-    if (allSymptoms.length > 0 && user) {
-      await supabase.from("symptom_logs").insert([{ user_id: user.id, symptoms: allSymptoms }]);
-      fetchSymptomLogs(user);
-    }
+    if (allSymptoms.length > 0 && user) await supabase.from("symptom_logs").insert([{ user_id: user.id, symptoms: allSymptoms }]);
     setLoading(false);
     if (error) alert("Error: " + error.message); else setApptStep(3);
   };
@@ -347,13 +368,8 @@ export default function App() {
 
   const handleReferral = () => {
     const msg = `🩺 I consult with Dr. Vivek Shirol for my gut health!\n\nDr. Vivek Shirol\nMBBS, MD, DM Gastroenterology, SGPGI\n🏥 Dr. Vivek's Complete Gastro Care Clinic\n📍 Belagavi, Karnataka\n📞 8310417749\n🕐 Mon–Sat: 5 PM – 9 PM\n\n📍 Find the clinic here:\nhttps://maps.app.goo.gl/eQvb8QB8ANJPX2pU7\n\n💊 Book an appointment:\nhttps://gastrodoc.vercel.app`;
-    if (navigator.share) {
-      navigator.share({ title: "Dr. Vivek Shirol — Gastroenterologist", text: msg });
-    } else {
-      navigator.clipboard.writeText(msg);
-      setReferralCopied(true);
-      setTimeout(() => setReferralCopied(false), 2500);
-    }
+    if (navigator.share) navigator.share({ title: "Dr. Vivek Shirol — Gastroenterologist", text: msg });
+    else { navigator.clipboard.writeText(msg); setReferralCopied(true); setTimeout(() => setReferralCopied(false), 2500); }
   };
 
   const navScreens = [
@@ -370,10 +386,11 @@ export default function App() {
   if (!user) {
     return (
       <div style={s.app}>
+        <Watermark />
         <div style={s.navbar}><div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div></div>
         <div style={s.page}>
           <div style={{ textAlign: "center", padding: "20px 0 28px" }}>
-            <p style={{ fontSize: 48, margin: "0 0 12px" }}>🩺</p>
+            <img src="/clinic-logo.png.jpg" alt="GastroDoc" style={{ width: 90, height: 90, objectFit: "contain", marginBottom: 12, opacity: 0.9 }} />
             <h2 style={{ color: "#00c9a7", fontSize: 22, margin: "0 0 6px" }}>{authMode === "login" ? "Welcome Back!" : "Create Account"}</h2>
             <p style={{ color: "#7fa8c9", fontSize: 13, margin: 0 }}>{authMode === "login" ? "Sign in to access your health portal" : "Join Dr. Vivek's patient portal"}</p>
           </div>
@@ -408,6 +425,7 @@ export default function App() {
   if (showDiagnosisScreen) {
     return (
       <div style={s.app}>
+        <Watermark />
         <div style={s.navbar}><div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div></div>
         <div style={s.page}>
           <h2 style={s.title}>My Diagnosis 🏥</h2>
@@ -430,6 +448,7 @@ export default function App() {
   // ── MAIN APP ──
   return (
     <div style={s.app}>
+      <Watermark />
       <div style={s.navbar}>
         <div><div style={s.logo}>🩺 GastroDoc</div><div style={{ color: "#7fa8c9", fontSize: 10 }}>{clinic.clinic}</div></div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -442,8 +461,6 @@ export default function App() {
         <div style={s.page}>
           <h2 style={{ color: "#00c9a7", fontSize: 20, marginBottom: 4 }}>Welcome 👋</h2>
           <p style={{ color: "#7fa8c9", fontSize: 13, marginBottom: 20 }}>Hello, {user.user_metadata?.full_name || user.email}!</p>
-
-          {/* DOCTOR CARD */}
           <div style={{ ...s.card, background: "linear-gradient(135deg,#0d2d50,#0a1f3a)" }}>
             <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
               <div style={{ flexShrink: 0, width: 110, border: "3px solid #00c9a7", borderRadius: 10, boxShadow: "0 0 14px #00c9a750", overflow: "hidden", background: "#b8cdd8" }}>
@@ -462,15 +479,9 @@ export default function App() {
               </div>
             </div>
           </div>
-
-          {/* GPS BUTTON */}
           <a href={clinic.mapsLink} target="_blank" rel="noreferrer" style={{ display: "block", textDecoration: "none" }}>
-            <button style={s.btnGps}>
-              📍 Get Directions to Clinic
-            </button>
+            <button style={s.btnGps}>📍 Get Directions to Clinic</button>
           </a>
-
-          {/* DIAGNOSIS CARD */}
           <div style={{ ...s.card, borderLeft: "3px solid #a855f7", cursor: "pointer", marginTop: 12 }} onClick={() => setShowDiagnosisScreen(true)}>
             <p style={{ color: "#a855f7", fontSize: 11, fontWeight: "bold", marginBottom: 5 }}>🏥 MY DIAGNOSIS</p>
             {diagnosis ? (
@@ -482,44 +493,35 @@ export default function App() {
               <p style={{ color: "#7fa8c9", fontSize: 13, margin: 0 }}>Tap here to enter your diagnosis → Get personalised health tips!</p>
             )}
           </div>
-
-          {/* DAILY HEALTH TIP */}
           <div style={{ ...s.card, borderLeft: "3px solid #3b82f6" }}>
             <p style={{ color: "#3b82f6", fontSize: 11, fontWeight: "bold", marginBottom: 8 }}>💡 DAILY HEALTH TIP</p>
             <p style={{ color: "#e8f4f8", fontSize: 14, lineHeight: 1.7, margin: "0 0 10px" }}>{todaysTip.tip}</p>
             <p style={{ color: "#7fa8c9", fontSize: 10, lineHeight: 1.5, margin: 0, borderTop: "1px solid #1e3a5f", paddingTop: 8 }}>📚 {todaysTip.ref}</p>
           </div>
-
           <button style={s.btn} onClick={() => { setApptStep(1); setApptSymptoms([]); setApptExtraSymptom(""); setApptName(""); setApptPhone(""); setApptDate(""); setScreen("appointments"); }}>📅 Book Appointment</button>
           <button style={s.btnOutline} onClick={() => setScreen("bristol")}>💧 Bristol Stool Tracker</button>
           <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("diet")}>🥗 My Diet Chart</button>
           <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("videos")}>▶️ Health Videos & Prep Guide</button>
           <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("contact")}>💬 Contact Us</button>
           <button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => setScreen("feedback")}>⭐ Give Feedback</button>
-
-          {/* REFERRAL BUTTON */}
           <button style={{ ...s.btnOutline, marginTop: 8, color: "#f59e0b", borderColor: "#f59e0b40" }} onClick={handleReferral}>
             {referralCopied ? "✅ Copied! Share with friends" : "🤝 Refer a Friend to Dr. Vivek"}
           </button>
-
           <button style={s.btnDanger} onClick={handleLogout}>🚪 Sign Out</button>
         </div>
       )}
 
-      {/* ── APPOINTMENTS (3-step flow with symptoms) ── */}
+      {/* ── APPOINTMENTS ── */}
       {screen === "appointments" && (
         <div style={s.page}>
-          {/* Step indicator */}
           <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
             {["Symptoms", "Details", "Done"].map((label, i) => (
               <div key={i} style={{ flex: 1, textAlign: "center" }}>
-                <div style={{ width: 28, height: 28, borderRadius: "50%", background: apptStep > i ? "#00c9a7" : apptStep === i + 1 ? "#00c9a7" : "#1e3a5f", color: apptStep >= i + 1 ? "#0a1628" : "#7fa8c9", fontWeight: "bold", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 4px" }}>{i + 1}</div>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: apptStep >= i + 1 ? "#00c9a7" : "#1e3a5f", color: apptStep >= i + 1 ? "#0a1628" : "#7fa8c9", fontWeight: "bold", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 4px" }}>{i + 1}</div>
                 <div style={{ fontSize: 10, color: apptStep === i + 1 ? "#00c9a7" : "#7fa8c9" }}>{label}</div>
               </div>
             ))}
           </div>
-
-          {/* STEP 1: Symptoms */}
           {apptStep === 1 && (
             <>
               <h2 style={s.title}>Book Appointment</h2>
@@ -538,8 +540,6 @@ export default function App() {
               <BackHomeBtn onPress={() => setScreen("home")} />
             </>
           )}
-
-          {/* STEP 2: Appointment details */}
           {apptStep === 2 && (
             <>
               <h2 style={s.title}>Appointment Details</h2>
@@ -561,8 +561,6 @@ export default function App() {
               <button style={s.btnOutline} onClick={() => setApptStep(1)}>← Back to Symptoms</button>
             </>
           )}
-
-          {/* STEP 3: Done */}
           {apptStep === 3 && (
             <div style={s.success}>
               <p style={{ fontSize: 48, margin: "0 0 12px", textAlign: "center" }}>✅</p>
@@ -575,8 +573,6 @@ export default function App() {
               <BackHomeBtn onPress={() => setScreen("home")} />
             </div>
           )}
-
-          {/* Past bookings */}
           {apptStep !== 3 && savedAppointments.length > 0 && (
             <div style={{ marginTop: 20 }}>
               <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 10 }}>RECENT BOOKINGS</p>
@@ -586,24 +582,41 @@ export default function App() {
         </div>
       )}
 
-      {/* ── BRISTOL ── */}
+      {/* ── BRISTOL — IMAGE BUTTONS ── */}
       {screen === "bristol" && (
         <div style={s.page}>
           <h2 style={s.title}>Bristol Stool Chart</h2>
-          <p style={{ color: "#7fa8c9", fontSize: 13, marginBottom: 20 }}>Tap your stool type to log it</p>
-          {bristolTypes.map(b => (
-            <div key={b.type} style={s.bristolCard(bristolSelected?.type === b.type)} onClick={() => { setBristolSelected(b); setBristolLogged(false); }}>
-              <span style={{ fontSize: 26 }}>{b.emoji}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
-                  <span style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 14 }}>Type {b.type}</span>
-                  <span style={{ background: b.color + "30", color: b.color, fontSize: 10, padding: "2px 8px", borderRadius: 20 }}>{b.tag}</span>
+          <p style={{ color: "#7fa8c9", fontSize: 13, marginBottom: 16 }}>Tap your stool type to log it</p>
+          {bristolTypes.map(b => {
+            const selected = bristolSelected?.type === b.type;
+            return (
+              <div key={b.type}
+                onClick={() => { setBristolSelected(b); setBristolLogged(false); }}
+                style={{
+                  background: selected ? "#00c9a720" : "#132850",
+                  border: selected ? `2px solid #00c9a7` : "2px solid transparent",
+                  borderRadius: 14, marginBottom: 10, cursor: "pointer",
+                  overflow: "hidden", display: "flex", alignItems: "center",
+                  boxShadow: selected ? "0 0 12px #00c9a730" : "none",
+                  transition: "all 0.2s",
+                }}>
+                {/* ── Actual Bristol image ── */}
+                <img
+                  src={b.img}
+                  alt={`Bristol Type ${b.type}`}
+                  style={{ width: 110, height: 80, objectFit: "cover", flexShrink: 0 }}
+                />
+                <div style={{ flex: 1, padding: "10px 12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <span style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 14 }}>Type {b.type}</span>
+                    <span style={{ background: b.color + "30", color: b.color, fontSize: 10, padding: "2px 8px", borderRadius: 20 }}>{b.tag}</span>
+                  </div>
+                  <p style={{ color: "#7fa8c9", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{b.desc}</p>
                 </div>
-                <p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>{b.desc}</p>
+                {selected && <span style={{ color: "#00c9a7", fontSize: 22, paddingRight: 12 }}>✓</span>}
               </div>
-              {bristolSelected?.type === b.type && <span style={{ color: "#00c9a7", fontSize: 18 }}>✓</span>}
-            </div>
-          ))}
+            );
+          })}
           {bristolSelected && (<button style={s.btn} onClick={handleBristolLog}>{bristolLogged ? "✅ Logged!" : "Log This Entry"}</button>)}
           {bristolHistory.length > 0 && (
             <div style={{ marginTop: 20 }}>
@@ -620,30 +633,23 @@ export default function App() {
         <div style={s.page}>
           <h2 style={s.title}>Diet Charts 🥗</h2>
           <p style={{ color: "#7fa8c9", fontSize: 13, marginBottom: 20 }}>Download your personalised diet chart by Dr. Vivek Shirol</p>
-
           {dietCharts.map((chart, i) => {
             const isRecommended = diagnosis && (diagnosis.includes(chart.diagnosis.split("/")[0].trim()) || chart.diagnosis.includes(diagnosis.split("/")[0].trim()));
             const url = `${SUPABASE_STORAGE}/${encodeURIComponent(chart.file)}`;
             return (
               <div key={i} style={{ ...s.card, border: isRecommended ? "2px solid #00c9a7" : "1px solid #1e3a5f", position: "relative" }}>
-                {isRecommended && (
-                  <div style={{ position: "absolute", top: -10, right: 12, background: "#00c9a7", color: "#0a1628", fontSize: 9, fontWeight: "bold", padding: "2px 10px", borderRadius: 20 }}>⭐ RECOMMENDED FOR YOU</div>
-                )}
+                {isRecommended && (<div style={{ position: "absolute", top: -10, right: 12, background: "#00c9a7", color: "#0a1628", fontSize: 9, fontWeight: "bold", padding: "2px 10px", borderRadius: 20 }}>⭐ RECOMMENDED FOR YOU</div>)}
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 44, height: 44, borderRadius: 12, background: chart.color + "20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>{chart.emoji}</div>
                   <div style={{ flex: 1 }}>
                     <p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 3px" }}>{chart.label}</p>
                     <p style={{ color: "#7fa8c9", fontSize: 11, margin: 0 }}>By {clinic.doctor}</p>
                   </div>
-                  <a href={url} target="_blank" rel="noreferrer" download
-                    style={{ background: chart.color, color: "#fff", padding: "8px 14px", borderRadius: 10, fontSize: 12, fontWeight: "bold", textDecoration: "none", flexShrink: 0 }}>
-                    ⬇ Download
-                  </a>
+                  <a href={url} target="_blank" rel="noreferrer" download style={{ background: chart.color, color: "#fff", padding: "8px 14px", borderRadius: 10, fontSize: 12, fontWeight: "bold", textDecoration: "none", flexShrink: 0 }}>⬇ Download</a>
                 </div>
               </div>
             );
           })}
-
           <div style={{ ...s.card, textAlign: "center", marginTop: 8 }}>
             <p style={{ color: "#7fa8c9", fontSize: 12, margin: 0 }}>💡 Enter your diagnosis in the home screen to get your chart recommended automatically!</p>
           </div>
@@ -651,13 +657,11 @@ export default function App() {
         </div>
       )}
 
-      {/* ── VIDEOS + PRE-PROCEDURE ── */}
+      {/* ── VIDEOS ── */}
       {screen === "videos" && (
         <div style={s.page}>
           <h2 style={s.title}>Videos & Prep Guide ▶️</h2>
           <p style={{ color: "#7fa8c9", fontSize: 13, marginBottom: 16 }}>Educational content by {clinic.doctor}</p>
-
-          {/* Pre-procedure section */}
           <p style={{ color: "#f59e0b", fontSize: 11, fontWeight: "bold", marginBottom: 10, letterSpacing: 1 }}>🔬 PRE-PROCEDURE PREPARATION</p>
           {procedureVideos.map((v, i) => (
             <div key={i} style={{ ...s.card, borderLeft: `3px solid ${v.color}` }}>
@@ -671,8 +675,6 @@ export default function App() {
               </div>
             </div>
           ))}
-
-          {/* General health videos */}
           <p style={{ color: "#00c9a7", fontSize: 11, fontWeight: "bold", marginBottom: 10, marginTop: 8, letterSpacing: 1 }}>🎥 HEALTH EDUCATION</p>
           {videos.map((v, i) => (
             <div key={i} style={s.card}>
@@ -722,9 +724,7 @@ export default function App() {
               <div style={s.card}>
                 <p style={{ color: "#7fa8c9", fontSize: 11, fontWeight: "bold", marginBottom: 12 }}>RATE YOUR CONSULTATION</p>
                 <div style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 8 }}>
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <span key={star} onClick={() => setFeedbackRating(star)} style={{ fontSize: 36, cursor: "pointer", color: star <= feedbackRating ? "#f59e0b" : "#1e3a5f" }}>★</span>
-                  ))}
+                  {[1, 2, 3, 4, 5].map(star => (<span key={star} onClick={() => setFeedbackRating(star)} style={{ fontSize: 36, cursor: "pointer", color: star <= feedbackRating ? "#f59e0b" : "#1e3a5f" }}>★</span>))}
                 </div>
                 <p style={{ color: "#7fa8c9", fontSize: 12, textAlign: "center", margin: 0 }}>
                   {feedbackRating === 0 ? "Tap a star to rate" : feedbackRating === 5 ? "Excellent! 🎉" : feedbackRating === 4 ? "Very Good 😊" : feedbackRating === 3 ? "Good 🙂" : feedbackRating === 2 ? "Fair 😐" : "Poor 😞"}
@@ -746,7 +746,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Bottom Nav */}
       <div style={s.bottomNav}>
         {navScreens.map(n => (
           <button key={n.id} style={s.bottomBtn(screen === n.id)} onClick={() => setScreen(n.id)}>
