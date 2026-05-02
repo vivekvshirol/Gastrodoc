@@ -8,7 +8,8 @@ const supabase = createClient(
 
 const SUPABASE_STORAGE = "https://nmatlgpcvhvgeqiazutu.supabase.co/storage/v1/object/public/diet-charts";
 
-const clinic = {
+// ── Fallback clinic (shown while Supabase loads) ──
+const clinicDefault = {
   doctor: "Dr. Vivek Shirol",
   quals: "MBBS, MD, DM Gastroenterology, SGPGI",
   clinic: "Dr. Vivek's Complete Gastro Care Clinic",
@@ -19,25 +20,7 @@ const clinic = {
   mapsLink: "https://maps.app.goo.gl/eQvb8QB8ANJPX2pU7",
 };
 
-const dietCharts = [
-  { label: "GERD & Dyspepsia", file: "GERD Dyspepsia diet chart.pdf", diagnosis: "GERD / Acid Reflux", emoji: "🔥", color: "#ef4444" },
-  { label: "IBS Diet Chart", file: "IBS Diet chart.pdf", diagnosis: "IBS (Irritable Bowel Syndrome)", emoji: "🌀", color: "#f59e0b" },
-  { label: "Inflammatory Bowel Disease", file: "Inflamatory Bowel Disease diet chart.pdf", diagnosis: "IBD / Crohn's Disease", emoji: "🔬", color: "#8b5cf6" },
-  { label: "Fatty Liver / MASLD", file: "Fatty liver MASLD diet chart.pdf", diagnosis: "NAFLD / Fatty Liver", emoji: "🫀", color: "#f97316" },
-  { label: "Chronic Liver Disease / Cirrhosis", file: "CLD liver cirrhosis diet chart.pdf", diagnosis: "CLD / Liver Cirrhosis", emoji: "🏥", color: "#dc2626" },
-  { label: "Constipation Diet Chart", file: "Constipation diet chart.pdf", diagnosis: "Chronic Constipation", emoji: "🌾", color: "#10b981" },
-];
-
-const procedureVideos = [
-  { title: "Colonoscopy Preparation", desc: "How to prepare for your colonoscopy procedure", link: "https://youtu.be/OkmdJVTRE78?si=4G2z80DLDz6JleiQ", emoji: "🔭", color: "#3b82f6" },
-  { title: "UGIE (Upper GI Endoscopy) Preparation", desc: "How to prepare for your upper GI endoscopy", link: "https://youtu.be/vItktDQo-mE?si=KWjEZAH2HClcY-kU", emoji: "🩺", color: "#8b5cf6" },
-];
-
-const videos = [
-  { title: "Understanding Your Gut Health", platform: "YouTube", link: "https://youtu.be/9gMcC8mCCVs?si=QScpjzeYeV7btk-i", emoji: "▶️", color: "#ef4444" },
-  { title: "GI Health Tips & Advice", platform: "YouTube", link: "https://youtu.be/nP8lG26EwdU?si=E8DAMIMFfwTU_haJ", emoji: "▶️", color: "#ef4444" },
-  { title: "Follow on Instagram", platform: "Instagram", link: "https://www.instagram.com/vivekshirol_234?igsh=MTloNzNxZ2xsbHp3NA==", emoji: "📱", color: "#e91e63" },
-];
+// ── All videos loaded from Supabase (videos + procedure_videos tables) ──
 
 // ── Bristol types with image paths ──
 const bristolTypes = [
@@ -175,12 +158,7 @@ const allHealthTips = [
   { tip: "🩺 Do not ignore persistent gut symptoms — blood in stool, unexplained weight loss, pain that wakes you at night, or worsening symptoms. These always need proper medical evaluation. Early diagnosis saves lives.", ref: "ASGE Patient Education — Diet and GERD (2014); Hashash JG et al. — AGA (2024)" },
 ];
 
-// ── Watermark background style applied to every page wrapper ──
-const bgStyle = {
-  position: "relative",
-  minHeight: "100vh",
-};
-
+// ── Watermark background style ──
 const watermarkStyle = {
   position: "fixed",
   top: "50%",
@@ -194,19 +172,9 @@ const watermarkStyle = {
   userSelect: "none",
 };
 
-const contentStyle = {
-  position: "relative",
-  zIndex: 1,
-};
-
 // ── Watermark component used on every screen ──
 const Watermark = () => (
-  <img
-    src="/clinic-logo.png.jpg"
-    alt=""
-    style={watermarkStyle}
-    aria-hidden="true"
-  />
+  <img src="/clinic-logo.png.jpg" alt="" style={watermarkStyle} aria-hidden="true" />
 );
 
 const s = {
@@ -263,6 +231,11 @@ export default function App() {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [referralCopied, setReferralCopied] = useState(false);
+  // ── Supabase-loaded data ──
+  const [clinic, setClinic] = useState(clinicDefault);
+  const [videos, setVideos] = useState([]);
+  const [dietCharts, setDietCharts] = useState([]);
+  const [procedureVideos, setProcedureVideos] = useState([]);
   const [apptStep, setApptStep] = useState(1);
   const [apptSymptoms, setApptSymptoms] = useState([]);
   const [apptExtraSymptom, setApptExtraSymptom] = useState("");
@@ -273,6 +246,39 @@ export default function App() {
 
   const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
   const todaysTip = allHealthTips[dayOfYear % allHealthTips.length];
+
+  const fetchClinicSettings = useCallback(async () => {
+    const { data } = await supabase.from("clinic_settings").select("key, value");
+    if (data && data.length > 0) {
+      const settings = {};
+      data.forEach(row => { settings[row.key] = row.value; });
+      setClinic({
+        doctor: settings.doctor || clinicDefault.doctor,
+        quals: settings.quals || clinicDefault.quals,
+        clinic: settings.clinic || clinicDefault.clinic,
+        address: settings.address || clinicDefault.address,
+        phone: settings.phone || clinicDefault.phone,
+        timings: settings.timings || clinicDefault.timings,
+        holiday: settings.holiday || clinicDefault.holiday,
+        mapsLink: settings.maps_link || clinicDefault.mapsLink,
+      });
+    }
+  }, []);
+
+  const fetchVideos = useCallback(async () => {
+    const { data } = await supabase.from("videos").select("*").order("sort_order", { ascending: true });
+    if (data && data.length > 0) setVideos(data);
+  }, []);
+
+  const fetchDietCharts = useCallback(async () => {
+    const { data } = await supabase.from("diet_charts").select("*").order("sort_order", { ascending: true });
+    if (data && data.length > 0) setDietCharts(data);
+  }, []);
+
+  const fetchProcedureVideos = useCallback(async () => {
+    const { data } = await supabase.from("procedure_videos").select("*").order("sort_order", { ascending: true });
+    if (data && data.length > 0) setProcedureVideos(data);
+  }, []);
 
   const fetchDiagnosis = useCallback(async (currentUser) => {
     const { data } = await supabase.from("patient_profiles").select("diagnosis").eq("user_id", currentUser.id).single();
@@ -288,8 +294,15 @@ export default function App() {
     await supabase.from("symptom_logs").select("*").eq("user_id", currentUser.id).order("logged_at", { ascending: false }).limit(20);
   }, []);
 
+  // ── Load clinic, videos, diet charts on mount (no login needed) ──
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    fetchClinicSettings();
+    fetchVideos();
+    fetchDietCharts();
+    fetchProcedureVideos();
+  }, [fetchClinicSettings, fetchVideos, fetchDietCharts, fetchProcedureVideos]);
+
+  useEffect(() => {().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) { fetchDiagnosis(session.user); fetchBristolLogs(session.user); fetchSymptomLogs(session.user); }
     });
@@ -663,14 +676,15 @@ export default function App() {
           <h2 style={s.title}>Videos & Prep Guide ▶️</h2>
           <p style={{ color: "#7fa8c9", fontSize: 13, marginBottom: 16 }}>Educational content by {clinic.doctor}</p>
           <p style={{ color: "#f59e0b", fontSize: 11, fontWeight: "bold", marginBottom: 10, letterSpacing: 1 }}>🔬 PRE-PROCEDURE PREPARATION</p>
+          {procedureVideos.length === 0 && <p style={{ color: "#7fa8c9", fontSize: 13, marginBottom: 10 }}>Loading...</p>}
           {procedureVideos.map((v, i) => (
-            <div key={i} style={{ ...s.card, borderLeft: `3px solid ${v.color}` }}>
+            <div key={i} style={{ ...s.card, borderLeft: `3px solid ${v.color || "#3b82f6"}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: v.color + "20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>{v.emoji}</div>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: (v.color || "#3b82f6") + "20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>{v.emoji || "🔬"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 13, margin: "0 0 3px" }}>{v.title}</p>
-                  <p style={{ color: "#7fa8c9", fontSize: 11, margin: "0 0 8px" }}>{v.desc}</p>
-                  <a href={v.link} target="_blank" rel="noreferrer" style={{ background: v.color, color: "#fff", padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: "bold", textDecoration: "none", display: "inline-block" }}>▶ Watch Now</a>
+                  <p style={{ color: "#7fa8c9", fontSize: 11, margin: "0 0 8px" }}>{v.description}</p>
+                  <a href={v.link} target="_blank" rel="noreferrer" style={{ background: v.color || "#3b82f6", color: "#fff", padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: "bold", textDecoration: "none", display: "inline-block" }}>▶ Watch Now</a>
                 </div>
               </div>
             </div>
