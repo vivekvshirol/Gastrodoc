@@ -302,7 +302,8 @@ export default function App() {
     fetchProcedureVideos();
   }, [fetchClinicSettings, fetchVideos, fetchDietCharts, fetchProcedureVideos]);
 
-  useEffect(() => {().then(({ data: { session } }) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) { fetchDiagnosis(session.user); fetchBristolLogs(session.user); fetchSymptomLogs(session.user); }
     });
