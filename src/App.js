@@ -405,7 +405,7 @@ export default function App() {
         <div style={s.page}>
           <div style={{ textAlign: "center", padding: "20px 0 28px" }}>
             <img src="/clinic-logo.png.jpg" alt="GastroDoc" style={{ width: 90, height: 90, objectFit: "contain", marginBottom: 12, opacity: 0.9 }} />
-            <h2 style={{ color: "#00c9a7", fontSize: 22, margin: "0 0 6px" }}>{authMode === "login" ? "Welcome Back!" : "Create Account"}</h2>
+            <h2 style={{ color: "#00c9a7", fontSize: 20, margin: "0 0 6px" }}>{authMode === "login" ? "Welcome to Gastrodoc app by Dr. Vivek Shirol" : "Create Account"}</h2>
             <p style={{ color: "#7fa8c9", fontSize: 13, margin: 0 }}>{authMode === "login" ? "Sign in to access your health portal" : "Join Dr. Vivek's patient portal"}</p>
           </div>
           <button style={s.btnGoogle} onClick={handleGoogleLogin}>
@@ -582,7 +582,6 @@ export default function App() {
               <p style={{ color: "#e8f4f8", fontSize: 14, margin: "0 0 3px" }}>👤 {apptName}</p>
               <p style={{ color: "#e8f4f8", fontSize: 14, margin: "0 0 3px" }}>📅 {apptDate} · {apptType}</p>
               {apptSymptoms.length > 0 && <p style={{ color: "#7fa8c9", fontSize: 12, margin: "6px 0 3px" }}>🩺 Symptoms: {apptSymptoms.join(", ")}{apptExtraSymptom ? ", " + apptExtraSymptom : ""}</p>}
-              <p style={{ color: "#7fa8c9", fontSize: 13, marginTop: 10 }}>{clinic.clinic} will confirm on {apptPhone} shortly.</p>
               <button style={{ ...s.btn, marginTop: 14 }} onClick={() => { setApptStep(1); setApptSymptoms([]); setApptExtraSymptom(""); setApptName(""); setApptPhone(""); setApptDate(""); fetchAppointments(); }}>Book Another</button>
               <BackHomeBtn onPress={() => setScreen("home")} />
             </div>
