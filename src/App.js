@@ -20,8 +20,6 @@ const clinicDefault = {
   mapsLink: "https://maps.app.goo.gl/eQvb8QB8ANJPX2pU7",
 };
 
-// ── All videos loaded from Supabase (videos + procedure_videos tables) ──
-
 // ── Bristol types with image paths ──
 const bristolTypes = [
   { type: 1, img: "/bristol1.jpg.jpg", desc: "Separate hard lumps, like little pebbles", tag: "Constipation", color: "#ef4444" },
@@ -172,7 +170,6 @@ const watermarkStyle = {
   userSelect: "none",
 };
 
-// ── Watermark component used on every screen ──
 const Watermark = () => (
   <img src="/clinic-logo.png.jpg" alt="" style={watermarkStyle} aria-hidden="true" />
 );
@@ -231,7 +228,6 @@ export default function App() {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [referralCopied, setReferralCopied] = useState(false);
-  // ── Supabase-loaded data ──
   const [clinic, setClinic] = useState(clinicDefault);
   const [videos, setVideos] = useState([]);
   const [dietCharts, setDietCharts] = useState([]);
@@ -294,7 +290,6 @@ export default function App() {
     await supabase.from("symptom_logs").select("*").eq("user_id", currentUser.id).order("logged_at", { ascending: false }).limit(20);
   }, []);
 
-  // ── Load clinic, videos, diet charts on mount (no login needed) ──
   useEffect(() => {
     fetchClinicSettings();
     fetchVideos();
@@ -321,10 +316,15 @@ export default function App() {
     if (data) setSavedAppointments(data);
   };
 
+  // ── CHANGE 1: Save diagnosis AND phone into patient_profiles ──
   const handleSaveDiagnosis = async () => {
     if (!selectedDiagnosis) return;
     setDiagnosisLoading(true);
-    const { error } = await supabase.from("patient_profiles").upsert({ user_id: user.id, diagnosis: selectedDiagnosis, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+    const { error } = await supabase.from("patient_profiles").upsert({
+      user_id: user.id,
+      diagnosis: selectedDiagnosis,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" });
     setDiagnosisLoading(false);
     if (!error) { setDiagnosis(selectedDiagnosis); setDiagnosisSaved(true); setTimeout(() => { setDiagnosisSaved(false); setShowDiagnosisScreen(false); }, 1500); }
   };
@@ -355,12 +355,38 @@ export default function App() {
 
   const toggleApptSymptom = (sym) => setApptSymptoms(prev => prev.includes(sym) ? prev.filter(x => x !== sym) : [...prev, sym]);
 
+  // ── CHANGE 2: handleAppointment now also saves user_id into appointments
+  //             AND saves phone into patient_profiles for permanent linking ──
   const handleAppointment = async () => {
     if (!apptName || !apptPhone || !apptDate) { alert("Please fill in all fields."); return; }
     setLoading(true);
     const allSymptoms = apptExtraSymptom ? [...apptSymptoms, apptExtraSymptom] : apptSymptoms;
-    const { error } = await supabase.from("appointments").insert([{ patient_name: apptName, phone: apptPhone, date: apptDate, visit_type: apptType }]);
-    if (allSymptoms.length > 0 && user) await supabase.from("symptom_logs").insert([{ user_id: user.id, symptoms: allSymptoms }]);
+
+    // Save appointment with user_id included (links appointment to logged-in patient)
+    const { error } = await supabase.from("appointments").insert([{
+      patient_name: apptName,
+      phone: apptPhone,
+      date: apptDate,
+      visit_type: apptType,
+      user_id: user ? user.id : null,        // ← ADDED: links appointment to auth user
+    }]);
+
+    // Save symptom log with user_id
+    if (allSymptoms.length > 0 && user) {
+      await supabase.from("symptom_logs").insert([{
+        user_id: user.id,
+        symptoms: allSymptoms,
+      }]);
+    }
+
+    // ── CHANGE 3: Save phone into patient_profiles so feedback can be linked by name ──
+    if (user && apptPhone) {
+      await supabase.from("patient_profiles").upsert({
+        user_id: user.id,
+        phone: apptPhone,
+      }, { onConflict: "user_id" });
+    }
+
     setLoading(false);
     if (error) alert("Error: " + error.message); else setApptStep(3);
   };
@@ -595,7 +621,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ── BRISTOL — IMAGE BUTTONS ── */}
+      {/* ── BRISTOL ── */}
       {screen === "bristol" && (
         <div style={s.page}>
           <h2 style={s.title}>Bristol Stool Chart</h2>
@@ -603,22 +629,9 @@ export default function App() {
           {bristolTypes.map(b => {
             const selected = bristolSelected?.type === b.type;
             return (
-              <div key={b.type}
-                onClick={() => { setBristolSelected(b); setBristolLogged(false); }}
-                style={{
-                  background: selected ? "#00c9a720" : "#132850",
-                  border: selected ? `2px solid #00c9a7` : "2px solid transparent",
-                  borderRadius: 14, marginBottom: 10, cursor: "pointer",
-                  overflow: "hidden", display: "flex", alignItems: "center",
-                  boxShadow: selected ? "0 0 12px #00c9a730" : "none",
-                  transition: "all 0.2s",
-                }}>
-                {/* ── Actual Bristol image ── */}
-                <img
-                  src={b.img}
-                  alt={`Bristol Type ${b.type}`}
-                  style={{ width: 110, height: 80, objectFit: "cover", flexShrink: 0 }}
-                />
+              <div key={b.type} onClick={() => { setBristolSelected(b); setBristolLogged(false); }}
+                style={{ background: selected ? "#00c9a720" : "#132850", border: selected ? `2px solid #00c9a7` : "2px solid transparent", borderRadius: 14, marginBottom: 10, cursor: "pointer", overflow: "hidden", display: "flex", alignItems: "center", boxShadow: selected ? "0 0 12px #00c9a730" : "none", transition: "all 0.2s" }}>
+                <img src={b.img} alt={`Bristol Type ${b.type}`} style={{ width: 110, height: 80, objectFit: "cover", flexShrink: 0 }} />
                 <div style={{ flex: 1, padding: "10px 12px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                     <span style={{ color: "#e8f4f8", fontWeight: "bold", fontSize: 14 }}>Type {b.type}</span>
