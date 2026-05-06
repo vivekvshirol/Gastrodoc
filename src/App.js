@@ -8,7 +8,6 @@ const supabase = createClient(
 
 const SUPABASE_STORAGE = "https://nmatlgpcvhvgeqiazutu.supabase.co/storage/v1/object/public/diet-charts";
 
-// ── Fallback clinic (shown while Supabase loads) ──
 const clinicDefault = {
   doctor: "Dr. Vivek Shirol",
   quals: "MBBS, MD, DM Gastroenterology, SGPGI",
@@ -20,7 +19,6 @@ const clinicDefault = {
   mapsLink: "https://maps.app.goo.gl/eQvb8QB8ANJPX2pU7",
 };
 
-// ── Bristol types with image paths ──
 const bristolTypes = [
   { type: 1, img: "/bristol1.jpg.jpg", desc: "Separate hard lumps, like little pebbles", tag: "Constipation", color: "#ef4444" },
   { type: 2, img: "/bristol2.jpg.jpg", desc: "Hard and lumpy, sausage-shaped", tag: "Constipation", color: "#ef4444" },
@@ -156,18 +154,9 @@ const allHealthTips = [
   { tip: "🩺 Do not ignore persistent gut symptoms — blood in stool, unexplained weight loss, pain that wakes you at night, or worsening symptoms. These always need proper medical evaluation. Early diagnosis saves lives.", ref: "ASGE Patient Education — Diet and GERD (2014); Hashash JG et al. — AGA (2024)" },
 ];
 
-// ── Watermark background style ──
 const watermarkStyle = {
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "80%",
-  maxWidth: 380,
-  opacity: 0.06,
-  pointerEvents: "none",
-  zIndex: 0,
-  userSelect: "none",
+  position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+  width: "80%", maxWidth: 380, opacity: 0.06, pointerEvents: "none", zIndex: 0, userSelect: "none",
 };
 
 const Watermark = () => (
@@ -191,7 +180,6 @@ const s = {
   btnDanger: { width: "100%", background: "#ef444420", color: "#ef4444", border: "1px solid #ef444440", padding: 12, borderRadius: 12, fontSize: 14, fontWeight: "bold", cursor: "pointer", marginTop: 8 },
   btnGoogle: { width: "100%", background: "#ffffff", color: "#444444", border: "1px solid #ddd", padding: 13, borderRadius: 12, fontSize: 15, fontWeight: "bold", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 },
   btnGps: { width: "100%", background: "linear-gradient(135deg,#16a34a,#15803d)", color: "#fff", border: "none", padding: 14, borderRadius: 12, fontSize: 15, fontWeight: "bold", cursor: "pointer", marginTop: 6, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 },
-  result: { background: "#132850", borderLeft: "4px solid #00c9a7", borderRadius: 12, padding: 14, marginTop: 14, lineHeight: 1.8 },
   success: { background: "#00c9a715", borderLeft: "4px solid #00c9a7", borderRadius: 12, padding: 16, marginTop: 14, lineHeight: 1.8 },
   divider: { display: "flex", alignItems: "center", gap: 10, margin: "16px 0" },
   dividerLine: { flex: 1, height: 1, background: "#1e3a5f" },
@@ -291,10 +279,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    fetchClinicSettings();
-    fetchVideos();
-    fetchDietCharts();
-    fetchProcedureVideos();
+    fetchClinicSettings(); fetchVideos(); fetchDietCharts(); fetchProcedureVideos();
   }, [fetchClinicSettings, fetchVideos, fetchDietCharts, fetchProcedureVideos]);
 
   useEffect(() => {
@@ -312,11 +297,10 @@ export default function App() {
   useEffect(() => { if (screen === "appointments" && user) fetchAppointments(); }, [screen, user]);
 
   const fetchAppointments = async () => {
-    const { data } = await supabase.from("appointments").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("appointments").select("*").order("Created_at", { ascending: false });
     if (data) setSavedAppointments(data);
   };
 
-  // ── CHANGE 1: Save diagnosis AND phone into patient_profiles ──
   const handleSaveDiagnosis = async () => {
     if (!selectedDiagnosis) return;
     setDiagnosisLoading(true);
@@ -329,7 +313,9 @@ export default function App() {
     if (!error) { setDiagnosis(selectedDiagnosis); setDiagnosisSaved(true); setTimeout(() => { setDiagnosisSaved(false); setShowDiagnosisScreen(false); }, 1500); }
   };
 
-  const handleGoogleLogin = async () => { await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: "https://gastrodoc.vercel.app" } }); };
+  const handleGoogleLogin = async () => {
+    await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: "https://gastrodoc.vercel.app" } });
+  };
 
   const handleSignUp = async () => {
     if (!authEmail || !authPassword || !authName) { setAuthError("Please fill in all fields."); return; }
@@ -337,7 +323,8 @@ export default function App() {
     setAuthLoading(true); setAuthError("");
     const { error } = await supabase.auth.signUp({ email: authEmail, password: authPassword, options: { data: { full_name: authName } } });
     setAuthLoading(false);
-    if (error) setAuthError(error.message); else setAuthError("✅ Account created! Please check your email to verify, then log in.");
+    if (error) setAuthError(error.message);
+    else setAuthError("✅ Account created! Please check your email to verify, then log in.");
   };
 
   const handleLogin = async () => {
@@ -355,23 +342,22 @@ export default function App() {
 
   const toggleApptSymptom = (sym) => setApptSymptoms(prev => prev.includes(sym) ? prev.filter(x => x !== sym) : [...prev, sym]);
 
-  // ── CHANGE 2: handleAppointment now also saves user_id into appointments
-  //             AND saves phone into patient_profiles for permanent linking ──
+  // ── KEY CHANGE: saves uuid (user_id) into appointments + phone into patient_profiles ──
   const handleAppointment = async () => {
     if (!apptName || !apptPhone || !apptDate) { alert("Please fill in all fields."); return; }
     setLoading(true);
     const allSymptoms = apptExtraSymptom ? [...apptSymptoms, apptExtraSymptom] : apptSymptoms;
 
-    // Save appointment with user_id included (links appointment to logged-in patient)
+    // Insert appointment — uuid column stores the logged-in user's id
     const { error } = await supabase.from("appointments").insert([{
       patient_name: apptName,
       phone: apptPhone,
       date: apptDate,
       visit_type: apptType,
-      user_id: user ? user.id : null,        // ← ADDED: links appointment to auth user
+      uuid: user ? user.id : null,          // ← saves to the 'uuid' column
     }]);
 
-    // Save symptom log with user_id
+    // Save symptom log
     if (allSymptoms.length > 0 && user) {
       await supabase.from("symptom_logs").insert([{
         user_id: user.id,
@@ -379,7 +365,7 @@ export default function App() {
       }]);
     }
 
-    // ── CHANGE 3: Save phone into patient_profiles so feedback can be linked by name ──
+    // Save phone into patient_profiles — this is the permanent bridge for MasterDoc
     if (user && apptPhone) {
       await supabase.from("patient_profiles").upsert({
         user_id: user.id,
@@ -393,7 +379,10 @@ export default function App() {
 
   const handleBristolLog = async () => {
     if (!bristolSelected) return;
-    if (user) { await supabase.from("bristol_logs").insert([{ user_id: user.id, stool_type: bristolSelected.type, tag: bristolSelected.tag }]); fetchBristolLogs(user); }
+    if (user) {
+      await supabase.from("bristol_logs").insert([{ user_id: user.id, stool_type: bristolSelected.type, tag: bristolSelected.tag }]);
+      fetchBristolLogs(user);
+    }
     setBristolLogged(true);
     setTimeout(() => { setBristolLogged(false); setBristolSelected(null); }, 2000);
   };
@@ -422,7 +411,6 @@ export default function App() {
     { id: "feedback", icon: "⭐", label: "Feedback" },
   ];
 
-  // ── AUTH SCREEN ──
   if (!user) {
     return (
       <div style={s.app}>
@@ -461,7 +449,6 @@ export default function App() {
     );
   }
 
-  // ── DIAGNOSIS SCREEN ──
   if (showDiagnosisScreen) {
     return (
       <div style={s.app}>
@@ -485,7 +472,6 @@ export default function App() {
     );
   }
 
-  // ── MAIN APP ──
   return (
     <div style={s.app}>
       <Watermark />
@@ -496,7 +482,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* ── HOME ── */}
       {screen === "home" && (
         <div style={s.page}>
           <h2 style={{ color: "#00c9a7", fontSize: 20, marginBottom: 4 }}>Welcome 👋</h2>
@@ -551,7 +536,6 @@ export default function App() {
         </div>
       )}
 
-      {/* ── APPOINTMENTS ── */}
       {screen === "appointments" && (
         <div style={s.page}>
           <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
@@ -621,7 +605,6 @@ export default function App() {
         </div>
       )}
 
-      {/* ── BRISTOL ── */}
       {screen === "bristol" && (
         <div style={s.page}>
           <h2 style={s.title}>Bristol Stool Chart</h2>
@@ -654,7 +637,6 @@ export default function App() {
         </div>
       )}
 
-      {/* ── DIET CHARTS ── */}
       {screen === "diet" && (
         <div style={s.page}>
           <h2 style={s.title}>Diet Charts 🥗</h2>
@@ -683,7 +665,6 @@ export default function App() {
         </div>
       )}
 
-      {/* ── VIDEOS ── */}
       {screen === "videos" && (
         <div style={s.page}>
           <h2 style={s.title}>Videos & Prep Guide ▶️</h2>
@@ -719,7 +700,6 @@ export default function App() {
         </div>
       )}
 
-      {/* ── CONTACT ── */}
       {screen === "contact" && (
         <div style={s.page}>
           <h2 style={s.title}>Contact Us 💬</h2>
@@ -741,7 +721,6 @@ export default function App() {
         </div>
       )}
 
-      {/* ── FEEDBACK ── */}
       {screen === "feedback" && (
         <div style={s.page}>
           <h2 style={s.title}>Give Feedback ⭐</h2>
